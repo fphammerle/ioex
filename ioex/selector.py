@@ -6,6 +6,10 @@ import curses.textpad
 import curses.wrapper
 import textwrap
 
+KEY_ESC = 27
+KEY_SDOWN = 336
+KEY_SUP = 337
+
 class Node(object):
 
     def __init__(self):
@@ -43,6 +47,15 @@ class Node(object):
 
     def select(self):
         self._selected = True
+
+    def unselect(self):
+        self._selected = False
+
+    def toggle(self):
+        if self.selected():
+            self.unselect()
+        else:
+            self.select()
 
     def selected(self):
         return self._selected
@@ -93,7 +106,7 @@ class SelectionPad(object):
     def resize_width(self, ncols):
         self.resize(self.get_height(), ncols)
 
-def select(stdscr, active_root):
+def select(stdscr, active_root, multiple = False):
 
     curses.curs_set(0)
     pad = SelectionPad(stdscr)
@@ -103,10 +116,13 @@ def select(stdscr, active_root):
     def get_screen_height():
         return stdscr.getmaxyx()[0]
 
+    def get_active_node():
+        return active_root.get_children()[active_index]
+
     def refresh():
         pad.clear()
         pad.resize_width(1)
-        pad.resize_height(len(active_root.get_children()))
+        pad.resize_height(active_root.child_count())
         for child_index in range(len(active_root.get_children())):
             child = active_root.get_children()[child_index]
             label = child.get_label()
@@ -139,17 +155,29 @@ def select(stdscr, active_root):
             return None
         if key == curses.KEY_RESIZE:
             refresh()
-        elif key in [curses.KEY_DOWN, ord('j')]:
+        elif key in [curses.KEY_DOWN, KEY_SDOWN, ord('j'), ord('J')]:
+            if key in [KEY_SDOWN, ord('J')]:
+                get_active_node().toggle()
             active_index = min(active_root.child_count() - 1, active_index + 1)
-        elif key in [curses.KEY_UP, ord('k')]:
+        elif key in [curses.KEY_UP, KEY_SUP, ord('k'), ord('K')]:
+            if key in [KEY_SUP, ord('K')]:
+                get_active_node().toggle()
             active_index = max(0, active_index - 1)
         elif key == curses.KEY_NPAGE:
             active_index = min(active_root.child_count() - 1, active_index + int(get_screen_height() / 2))
         elif key == curses.KEY_PPAGE:
-            active_index = max(0, active_index - get_screen_height())
-        elif key in [ord(' '), ord('\n')]:
-            active_root.get_children()[active_index].select()
+            active_index = max(0, active_index - int(get_screen_height() / 2))
+        elif key in [ord(' ')]:
+            if multiple:
+                get_active_node().toggle()
+            else:
+                get_active_node().select()
+                return active_root.find_root().find_selected()
+        elif key in [ord('\n')]:
+            get_active_node().select()
             return active_root.find_root().find_selected()
+        elif key == KEY_ESC:
+            return None
         else:
             raise Exception(key)
 
@@ -159,7 +187,7 @@ def select_lorem():
     root = StaticNode('root')
     for i in range(random.randint(128, 128)):
         root.append_child(StaticNode(str(i).ljust(5) + ''.join(random.choice(string.lowercase + string.uppercase + ' ') for i in range(random.randint(50, 160)))))
-    selection = curses.wrapper(select, root)
+    selection = curses.wrapper(select, root, multiple = True)
     if selection is None:
         print('aborted')
     else:
