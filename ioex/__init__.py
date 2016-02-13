@@ -1,7 +1,7 @@
 import os
 import sys
 
-def curses_tty_wrapper(function, *args):
+def curses_tty_wrapper(function, *args, **kwargs):
     stdin_fd = os.dup(sys.stdin.fileno())
     stdout_fd = os.dup(sys.stdout.fileno())
     # set stdin to tty
@@ -12,7 +12,7 @@ def curses_tty_wrapper(function, *args):
     os.dup2(tty_out.fileno(), sys.stdout.fileno())
     # os.system('ls -l /proc/self/fd/')
     import curses
-    result = curses.wrapper(function, *args)
+    result = curses.wrapper(function, *args, **kwargs)
     # reset stdin and stdout
     os.dup2(stdin_fd, sys.stdin.fileno())
     os.dup2(stdout_fd, sys.stdout.fileno())
