@@ -1,0 +1,33 @@
+#!/usr/bin/python
+# PYTHON_ARGCOMPLETE_OK
+
+import ioex.selector
+
+import os
+import sys
+import curses
+import argparse
+import argcomplete
+
+def _init_argparser():
+
+    argparser = argparse.ArgumentParser(description = None)
+    argparser.add_argument("--multiple", action = "store_true")
+    return argparser
+
+def main(argv):
+
+    argparser = _init_argparser()
+    argcomplete.autocomplete(argparser)
+    args = argparser.parse_args(argv)
+
+    lines = [l.strip() for l in sys.stdin]
+
+    selected_lines = ioex.curses_tty_wrapper(ioex.selector.select_string, lines, args.multiple) 
+
+    print('\n'.join(selected_lines))
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

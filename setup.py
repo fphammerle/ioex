@@ -5,7 +5,7 @@ import glob
 setup(
     name = 'ioex',
     packages = ['ioex'],
-    version = '0.1',
+    version = '0.2',
     description = 'extension for python\'s build-in input / output interface',
     author = 'Fabian Peter Hammerle',
     author_email = 'fabian.hammerle@gmail.com',
@@ -13,5 +13,6 @@ setup(
     download_url = 'https://github.com/fphammerle/ioex/tarball/0.1',
     keywords = [],
     classifiers = [],
+    scripts = glob.glob('scripts/*'),
     tests_require = ['pytest']
     )
