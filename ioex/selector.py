@@ -83,7 +83,10 @@ class SelectionPad(object):
         self._pad.refresh(pminrow, 0, 0, 0, smaxrow, smaxcol)
 
     def addstr(self, line_index, col_index, text, attr = 0):
-        self._pad.addstr(line_index, col_index, text, attr)
+        try:
+            self._pad.addstr(line_index, col_index, text, attr)
+        except Exception, ex:
+            raise Exception('pad(width=%d, height=%d).addstr(%d, %d, "%s", %d) failed' % (self.get_width(), self.get_height(), line_index, col_index, text, attr))
 
     def clear(self):
         self._pad.clear()
@@ -181,15 +184,9 @@ def select(stdscr, active_root, multiple = False):
         else:
             raise Exception(key)
 
-def select_lorem():
-    import random
-    import string
+def select_string(stdscr, strings, multiple = False):
     root = StaticNode('root')
-    for i in range(random.randint(128, 128)):
-        root.append_child(StaticNode(str(i).ljust(5) + ''.join(random.choice(string.lowercase + string.uppercase + ' ') for i in range(random.randint(50, 160)))))
-    selection = curses.wrapper(select, root, multiple = True)
-    if selection is None:
-        print('aborted')
-    else:
-        for node in selection:
-            print(node.label)
+    for string in strings:
+        root.append_child(StaticNode(string))
+    selection = select(stdscr, root, multiple = multiple)
+    return [n.get_label() for n in selection]
