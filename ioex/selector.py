@@ -189,4 +189,7 @@ def select_string(stdscr, strings, multiple = False):
     for string in strings:
         root.append_child(StaticNode(string))
     selection = select(stdscr, root, multiple = multiple)
-    return [n.get_label() for n in selection]
+    if selection is None:
+        return None
+    else:
+        return [n.get_label() for n in selection]
