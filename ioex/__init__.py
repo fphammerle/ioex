@@ -1,5 +1,6 @@
 import os
 import sys
+import locale
 
 def curses_tty_wrapper(function, *args, **kwargs):
     stdin_fd = os.dup(sys.stdin.fileno())
@@ -11,6 +12,7 @@ def curses_tty_wrapper(function, *args, **kwargs):
     tty_out = open('/dev/tty', 'w')
     os.dup2(tty_out.fileno(), sys.stdout.fileno())
     # os.system('ls -l /proc/self/fd/')
+    locale.setlocale(locale.LC_ALL, '')
     import curses
     result = curses.wrapper(function, *args, **kwargs)
     # reset stdin and stdout

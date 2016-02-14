@@ -4,6 +4,8 @@ import os
 import curses
 import curses.textpad
 import curses.wrapper
+import locale
+import pprint
 import textwrap
 
 KEY_ESC = 27
@@ -83,10 +85,11 @@ class SelectionPad(object):
         self._pad.refresh(pminrow, 0, 0, 0, smaxrow, smaxcol)
 
     def addstr(self, line_index, col_index, text, attr = 0):
+        text_encoded = text.encode(locale.getpreferredencoding())
         try:
-            self._pad.addstr(line_index, col_index, text, attr)
+            self._pad.addstr(line_index, col_index, text_encoded, attr)
         except Exception, ex:
-            raise Exception('pad(width=%d, height=%d).addstr(%d, %d, "%s", %d) failed' % (self.get_width(), self.get_height(), line_index, col_index, text, attr))
+            raise Exception('pad(width=%d, height=%d).addstr(%d, %d, "%s", %d) failed' % (self.get_width(), self.get_height(), line_index, col_index, text_encoded, attr))
 
     def clear(self):
         self._pad.clear()
