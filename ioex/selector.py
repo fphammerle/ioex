@@ -137,7 +137,10 @@ def select(stdscr, active_root, multiple = False):
         return stdscr.getmaxyx()[0]
 
     def get_active_node():
-        return active_root.get_children()[active_index]
+        if active_index < len(active_root.get_children()):
+            return active_root.get_children()[active_index]
+        else:
+            return None
 
     def get_visible_pad_height():
         return get_screen_height() - active_root.get_header_height()
@@ -180,30 +183,31 @@ def select(stdscr, active_root, multiple = False):
             key = pad.getch()
         except KeyboardInterrupt:
             return None
+        active_node = get_active_node()
         if key == curses.KEY_RESIZE:
             refresh()
         elif key in [curses.KEY_DOWN, KEY_SDOWN, ord('j'), ord('J')]:
             if multiple and key in [KEY_SDOWN, ord('J')]:
-                get_active_node().toggle()
+                active_node.toggle()
             active_index = min(active_root.child_count() - 1, active_index + 1)
         elif key in [curses.KEY_UP, KEY_SUP, ord('k'), ord('K')]:
             if multiple and key in [KEY_SUP, ord('K')]:
-                get_active_node().toggle()
+                active_node.toggle()
             active_index = max(0, active_index - 1)
-        elif key == curses.KEY_NPAGE:
+        elif key in [curses.KEY_NPAGE, ord('f') - ord('a') + 1]: # control-f
             active_index = min(active_root.child_count() - 1, active_index + int(get_visible_pad_height() / 2))
-        elif key == curses.KEY_PPAGE:
+        elif key in [curses.KEY_PPAGE, ord('b') - ord('a') + 1]: # control-b
             active_index = max(0, active_index - int(get_visible_pad_height() / 2))
-        elif key in [ord(' ')]:
+        elif active_node and key in [ord(' ')]:
             if multiple:
-                get_active_node().toggle()
+                active_node.toggle()
             else:
-                get_active_node().select()
+                active_node.select()
                 return active_root.find_root().find_selected()
-        elif key in [ord('\n')]:
-            get_active_node().select()
+        elif active_node and key in [ord('\n')]:
+            active_node.select()
             return active_root.find_root().find_selected()
-        elif key == KEY_ESC:
+        elif key in [ord('q'), KEY_ESC]:
             return None
         else:
             raise Exception(key)
