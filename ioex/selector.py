@@ -2,7 +2,6 @@
 
 import os
 import curses
-import curses.textpad
 import curses.wrapper
 import locale
 import pprint
@@ -209,8 +208,8 @@ def select(stdscr, active_root, multiple = False):
             return active_root.find_root().find_selected()
         elif key in [ord('q'), KEY_ESC]:
             return None
-        else:
-            raise Exception(key)
+        # else:
+        #     raise Exception(key)
 
 def select_string(stdscr, strings, multiple = False):
     root = StaticNode('root')

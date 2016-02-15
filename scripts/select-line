@@ -2,10 +2,10 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import ioex.selector
+import ioex.cursesex
 
 import os
 import sys
-import curses
 import argparse
 import argcomplete
 
@@ -23,7 +23,7 @@ def main(argv):
 
     lines = [l.strip() for l in sys.stdin]
 
-    selected_lines = ioex.curses_tty_wrapper(ioex.selector.select_string, lines, args.multiple) 
+    selected_lines = ioex.cursesex.tty_wrapper(ioex.selector.select_string, lines, args.multiple)
 
     print('\n'.join(selected_lines))
 
