@@ -49,6 +49,9 @@ class Node(object):
         child._parent = self
         self._children.append(child)
 
+    def get_parent(self):
+        return self._parent
+
     def get_header_height(self):
         return 0
 
