@@ -116,6 +116,8 @@ class SelectionPad(object):
         return self._pad.getch()
 
     def resize(self, nlines, ncols):
+        assert nlines > 0
+        assert ncols > 0
         try:
             self._pad.resize(nlines, ncols)
         except Exception, ex:

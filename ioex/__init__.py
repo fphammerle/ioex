@@ -1,5 +1,19 @@
 import os
 import sys
+import locale
+import threading
+import contextlib
+
+locale_lock = threading.Lock()
+
+@contextlib.contextmanager
+def setlocale(temporary_locale):
+    with locale_lock:
+        primary_locale = locale.setlocale(locale.LC_ALL)
+        try:
+            yield locale.setlocale(locale.LC_ALL, temporary_locale)
+        finally:
+            locale.setlocale(locale.LC_ALL, primary_locale)
 
 def raw_input_with_default(prompt, default):
     import readline
