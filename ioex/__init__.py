@@ -4,6 +4,9 @@ import locale
 import threading
 import contextlib
 
+class UnsupportedLocaleSettingError(locale.Error):
+    pass
+
 locale_lock = threading.Lock()
 
 @contextlib.contextmanager
@@ -11,7 +14,13 @@ def setlocale(temporary_locale):
     with locale_lock:
         primary_locale = locale.setlocale(locale.LC_ALL)
         try:
-            yield locale.setlocale(locale.LC_ALL, temporary_locale)
+            try:
+                yield locale.setlocale(locale.LC_ALL, temporary_locale)
+            except locale.Error, ex:
+                if ex.message == 'unsupported locale setting':
+                    raise UnsupportedLocaleSettingError(temporary_locale)
+                else:
+                    raise ex
         finally:
             locale.setlocale(locale.LC_ALL, primary_locale)
 
