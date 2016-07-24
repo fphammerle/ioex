@@ -110,8 +110,19 @@ class Period(object):
             flow_style = False,
             )
 
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, ', '.join([
+            'start = %r' % self.start,
+            'end = %r' % self.end,
+            ]))
+
+    @classmethod
+    def add_yaml_constructor(cls, loader, tag = yaml_tag):
+        add_yaml_timestamp_constructor(loader)
+        loader.add_constructor(tag, cls.from_yaml)
+
 if yaml:
     yaml.add_representer(Period, Period.to_yaml)
     yaml.SafeDumper.add_representer(Period, Period.to_yaml)
-    yaml.add_constructor(u'!period', Period.from_yaml)
-    yaml.SafeLoader.add_constructor(u'!period', Period.from_yaml)
+    Period.add_yaml_constructor(yaml.Loader)
+    Period.add_yaml_constructor(yaml.SafeLoader)

@@ -33,3 +33,14 @@ def test_from_yaml_tag(yaml_string, tag, expected_timestamp):
     loader = copy.deepcopy(yaml.SafeLoader)
     ioex.datetimeex.add_yaml_timestamp_constructor(loader, tag = tag)
     assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
+
+@pytest.mark.parametrize(('yaml_string', 'expected_timestamp'), [
+    ['2016-07-14 13:50:04', datetime.datetime(2016, 7, 14, 13, 50, 4, 0)],
+    ['2016-07-14 13:50:04Z', pytz.utc.localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
+    ])
+def test_from_yaml_repeat(yaml_string, expected_timestamp):
+    loader = copy.deepcopy(yaml.SafeLoader)
+    ioex.datetimeex.add_yaml_timestamp_constructor(loader)
+    assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
+    ioex.datetimeex.add_yaml_timestamp_constructor(loader)
+    assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
