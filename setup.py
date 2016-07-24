@@ -14,5 +14,6 @@ setup(
     keywords = [],
     classifiers = [],
     scripts = glob.glob('scripts/*'),
+    install_requires = ['python-dateutil'],
     tests_require = ['pytest', 'pytz']
     )

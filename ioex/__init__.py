@@ -1,9 +1,11 @@
-import os
-import sys
-import locale
-import datetime
-import threading
 import contextlib
+import datetime
+import dateutil.parser
+import locale
+import os
+import re
+import sys
+import threading
 
 class UnsupportedLocaleSettingError(locale.Error):
     pass
@@ -49,9 +51,19 @@ def int_input_with_default(prompt, default):
 
 class DatePeriod(object):
 
-    def __init__(self, start = None, end = None):
-        self.start = start
-        self.end = end
+    _timestamp_iso_format = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?(Z|[-\+]\d{2}:\d{2})?'
+    _timeperiod_iso_format = r'(?P<start>%(t)s)\/(?P<end>%(t)s)' % {'t': _timestamp_iso_format}
+
+    def __init__(self, start = None, end = None, isoformat = None):
+        self._start = None
+        self._end = None
+        if (start or end) and isoformat:
+            raise AttributeError('when providing isoformat no other parameters may be specified')
+        elif isoformat:
+            self.isoformat = isoformat
+        else:
+            self.start = start
+            self.end = end
 
     @property
     def start(self):
@@ -78,6 +90,18 @@ class DatePeriod(object):
         if self.start is None or self.end is None:
             raise ValueError('both start and end must be set')
         return '%s/%s' % (
-                self.start.isoformat().replace('+00:00', 'Z'), 
-                self.end.isoformat().replace('+00:00', 'Z'), 
+                self.start.isoformat().replace('+00:00', 'Z'),
+                self.end.isoformat().replace('+00:00', 'Z'),
                 )
+
+    @isoformat.setter
+    def isoformat(self, text):
+        match = re.search('^%s$' % self.__class__._timeperiod_iso_format, text)
+        if not match:
+            raise ValueError(
+                    "given string '%s' does not match the supported pattern '%s'"
+                     % (text, self.__class__._timeperiod_iso_format)
+                     )
+        attr = match.groupdict()
+        self.start = dateutil.parser.parse(attr['start'])
+        self.end = dateutil.parser.parse(attr['end'])
