@@ -2,34 +2,34 @@
 import pytest
 
 import pytz
-import ioex
+import ioex.datetimeex
 import datetime
 yaml = pytest.importorskip('yaml')
 
 @pytest.mark.parametrize(('period', 'yaml_string'), [
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nstart: 2016-07-24T12:21:00\nend: 2016-07-24T12:22:13',
         ],
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nstart: 2016-07-24 12:21:00\nend: 2016-07-24 12:22:13',
         ],
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13),
             ),
         '!period\nstart: 2016-07-24T12:20:00.025500\nend: 2016-07-24T12:21:00.000013',
         ],
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13, tzinfo = pytz.utc),
             ),
@@ -37,28 +37,28 @@ yaml = pytest.importorskip('yaml')
         ],
     ])
 def test_from_yaml(period, yaml_string):
-    if period.start.tzinfo or period.end.tzinfo: 
+    if period.start.tzinfo or period.end.tzinfo:
         pytest.xfail('pyyaml ignores timezones when loading timestamps')
     assert period == yaml.load(yaml_string)
     assert period == yaml.safe_load(yaml_string)
 
 @pytest.mark.parametrize(('period', 'yaml_string'), [
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nend: 2016-07-24 12:22:13\nstart: 2016-07-24 12:21:00\n',
         ],
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13),
             ),
         '!period\nend: 2016-07-24 12:21:00.000013\nstart: 2016-07-24 12:20:00.025500\n',
         ],
     [
-        ioex.Period(
+        ioex.datetimeex.Period(
             start = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 12, 20, 0)),
             end = pytz.utc.localize(datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13)),
             ),
