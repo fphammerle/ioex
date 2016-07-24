@@ -12,7 +12,7 @@ import datetime
     [None, None],
     ])
 def test_dateperiod_init_start_end(start, end):
-    p = ioex.DatePeriod(start = start, end = end)
+    p = ioex.Period(start = start, end = end)
     assert p.start == start
     assert p.end == end
 
@@ -22,7 +22,7 @@ def test_dateperiod_init_start_end(start, end):
     ])
 def test_dateperiod_init_start_end_fail(start, end):
     with pytest.raises(TypeError):
-        ioex.DatePeriod(start = start, end = end)
+        ioex.Period(start = start, end = end)
 
 @pytest.mark.parametrize(('start', 'end', 'iso'), [
     [
@@ -32,7 +32,7 @@ def test_dateperiod_init_start_end_fail(start, end):
         ],
     ])
 def test_dateperiod_init_isoformat(start, end, iso):
-    p = ioex.DatePeriod(isoformat = iso)
+    p = ioex.Period(isoformat = iso)
     assert p.start == start
     assert p.end == end
 
@@ -53,14 +53,14 @@ def test_dateperiod_init_isoformat(start, end, iso):
     ])
 def test_dateperiod_init_param_fail(params):
     with pytest.raises(StandardError):
-        ioex.DatePeriod(**params)
+        ioex.Period(**params)
 
 @pytest.mark.parametrize(('start'), [
     datetime.datetime(2016, 7, 24, 12, 21),
     None,
     ])
 def test_dateperiod_set_start(start):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     assert p.start is None
     p.start = start
     assert p.start == start
@@ -69,7 +69,7 @@ def test_dateperiod_set_start(start):
     ':-/',
     ])
 def test_dateperiod_set_start_fail(start):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     with pytest.raises(TypeError):
         p.start = start
 
@@ -78,7 +78,7 @@ def test_dateperiod_set_start_fail(start):
     None,
     ])
 def test_dateperiod_set_end(end):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     assert p.end is None
     p.end = end
     assert p.end == end
@@ -87,7 +87,7 @@ def test_dateperiod_set_end(end):
     ':-/',
     ])
 def test_dateperiod_set_end_fail(end):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     with pytest.raises(TypeError):
         p.end = end
 
@@ -119,7 +119,7 @@ def test_dateperiod_set_end_fail(end):
         ],
     ])
 def test_dateperiod_get_isoformat(start, end, iso):
-    p = ioex.DatePeriod(start = start, end = end)
+    p = ioex.Period(start = start, end = end)
     assert p.isoformat == iso
 
 @pytest.mark.parametrize(('start', 'end', 'iso'), [
@@ -155,7 +155,7 @@ def test_dateperiod_get_isoformat(start, end, iso):
         ],
     ])
 def test_dateperiod_set_isoformat(start, end, iso):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     p.isoformat = iso
     assert p.start == start
     assert p.end == end
@@ -164,37 +164,37 @@ def test_dateperiod_set_isoformat(start, end, iso):
     '2016-07-24T12:20:0<INVALID>0.0255/2016-07-24T12:21:00.13Z',
     ])
 def test_dateperiod_set_isoformat_fail(iso):
-    p = ioex.DatePeriod()
+    p = ioex.Period()
     with pytest.raises(ValueError):
         p.isoformat = iso
 
 @pytest.mark.parametrize(('a', 'b'), [
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13, 0),
             ),
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
-        ioex.DatePeriod(
+        ioex.Period(
             start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
             end = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 12, 22, 13)),
             ),
-        ioex.DatePeriod(
+        ioex.Period(
             start = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 11, 21, 0)),
             end = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 13, 22, 13)),
             ),

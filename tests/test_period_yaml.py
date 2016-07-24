@@ -8,28 +8,28 @@ yaml = pytest.importorskip('yaml')
 
 @pytest.mark.parametrize(('period', 'yaml_string'), [
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nstart: 2016-07-24T12:21:00\nend: 2016-07-24T12:22:13',
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nstart: 2016-07-24 12:21:00\nend: 2016-07-24 12:22:13',
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13),
             ),
         '!period\nstart: 2016-07-24T12:20:00.025500\nend: 2016-07-24T12:21:00.000013',
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13, tzinfo = pytz.utc),
             ),
@@ -44,21 +44,21 @@ def test_dateperiod_from_yaml(period, yaml_string):
 
 @pytest.mark.parametrize(('period', 'yaml_string'), [
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 21, 0),
             end = datetime.datetime(2016, 7, 24, 12, 22, 13),
             ),
         '!period\nend: 2016-07-24 12:22:13\nstart: 2016-07-24 12:21:00\n',
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
             end = datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13),
             ),
         '!period\nend: 2016-07-24 12:21:00.000013\nstart: 2016-07-24 12:20:00.025500\n',
         ],
     [
-        ioex.DatePeriod(
+        ioex.Period(
             start = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 12, 20, 0)),
             end = pytz.utc.localize(datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13)),
             ),

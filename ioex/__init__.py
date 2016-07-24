@@ -53,7 +53,7 @@ def int_input_with_default(prompt, default):
     else:
         return None
 
-class DatePeriod(object):
+class Period(object):
 
     yaml_tag = u'!period'
 
@@ -134,7 +134,7 @@ class DatePeriod(object):
             )
 
 if yaml:
-    yaml.add_representer(DatePeriod, DatePeriod.to_yaml)
-    yaml.SafeDumper.add_representer(DatePeriod, DatePeriod.to_yaml)
-    yaml.add_constructor(u'!period', DatePeriod.from_yaml)
-    yaml.SafeLoader.add_constructor(u'!period', DatePeriod.from_yaml)
+    yaml.add_representer(Period, Period.to_yaml)
+    yaml.SafeDumper.add_representer(Period, Period.to_yaml)
+    yaml.add_constructor(u'!period', Period.from_yaml)
+    yaml.SafeLoader.add_constructor(u'!period', Period.from_yaml)
