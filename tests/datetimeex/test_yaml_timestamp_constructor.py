@@ -16,11 +16,14 @@ import pytz
     ['2016-01-14 13:50:04+01:00', pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 1, 14, 13, 50, 4, 0))],
     ['2016-07-14 13:50:04+02:00', pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
     ['2016-07-14 13:50:04+02:00', datetime.datetime(2016, 7, 14, 13, 50, 4, 0, tzinfo = dateutil.tz.tz.tzoffset('Vienna', 2 * 60 * 60))],
+    ['2016-07-14 13:50:04-07:00', pytz.timezone('US/Pacific').localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
     ])
 def test_from_yaml(yaml_string, expected_timestamp, loader):
     loader_copy = copy.deepcopy(loader)
     ioex.datetimeex.add_yaml_timestamp_constructor(loader_copy)
-    assert yaml.load(yaml_string, Loader = loader_copy) == expected_timestamp
+    loaded_timestamp = yaml.load(yaml_string, Loader = loader_copy)
+    assert loaded_timestamp == expected_timestamp
+    assert loaded_timestamp.utcoffset() == expected_timestamp.utcoffset()
 
 @pytest.mark.parametrize(('yaml_string', 'tag', 'expected_timestamp'), [
     ['!without_timezone 2016-07-14 13:50:04', '!without_timezone', datetime.datetime(2016, 7, 14, 13, 50, 4, 0)],
