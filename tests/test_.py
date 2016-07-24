@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
+import pytz
 import ioex
 import locale
 import datetime
@@ -16,7 +17,6 @@ def test_setlocale_unsupported(locale_code):
 def test_setlocale_unsupported_inheritance():
     assert issubclass(ioex.UnsupportedLocaleSettingError, locale.Error)
 
-@pytest.mark.xfail(raises = ioex.UnsupportedLocaleSettingError)
 @pytest.mark.parametrize(('dt', 'dt_format', 'locale_code', 'expected_string'), [
     [datetime.datetime(2016, 07, 23, 1, 7, 12), '%x', 'de_DE.utf8', u'23.07.2016'],
     [datetime.datetime(2016, 07, 23, 1, 7, 12), '%X', 'de_DE.utf8', u'01:07:12'],
@@ -28,8 +28,11 @@ def test_setlocale_unsupported_inheritance():
     [datetime.datetime(2016, 07, 23, 1, 7, 12), '%X', 'zh_CN.utf8', u'01时07分12秒'],
     ])
 def test_setlocale_strtime(dt, dt_format, locale_code, expected_string):
-    with ioex.setlocale(locale_code):
-        assert dt.strftime(dt_format).decode('utf-8') == expected_string
+    try:
+        with ioex.setlocale(locale_code):
+            assert dt.strftime(dt_format).decode('utf-8') == expected_string
+    except ioex.UnsupportedLocaleSettingError, ex:
+        pytest.skip('locale %s unsupported' % locale_code)
 
 @pytest.mark.parametrize(('start', 'end'), [
     [datetime.datetime(2016, 7, 24, 12, 21), datetime.datetime(2016, 7, 24, 12, 22)],
@@ -85,3 +88,34 @@ def test_dateperiod_set_end_fail(end):
     p = ioex.DatePeriod()
     with pytest.raises(TypeError):
         p.end = end
+
+@pytest.mark.parametrize(('start', 'end', 'iso'), [
+    [
+        datetime.datetime(2016, 7, 24, 12, 21, 0),
+        datetime.datetime(2016, 7, 24, 12, 22, 13),
+        '2016-07-24T12:21:00/2016-07-24T12:22:13',
+        ],
+    [
+        datetime.datetime(2016, 7, 24, 12, 21, 0, tzinfo = pytz.utc),
+        datetime.datetime(2016, 7, 24, 12, 22, 13, tzinfo = pytz.utc),
+        '2016-07-24T12:21:00Z/2016-07-24T12:22:13Z',
+        ],
+    [
+        datetime.datetime(2016, 7, 24, 12, 21, 0, tzinfo = pytz.utc),
+        pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 22, 13)),
+        '2016-07-24T12:21:00Z/2016-07-24T12:22:13+02:00',
+        ],
+    [
+        pytz.timezone('US/Pacific').localize(datetime.datetime(2016, 1, 12, 12, 22, 13)),
+        pytz.timezone('Europe/London').localize(datetime.datetime(2016, 1, 24, 12, 22, 13)),
+        '2016-01-12T12:22:13-08:00/2016-01-24T12:22:13Z',
+        ],
+    [
+        datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond = 25500),
+        datetime.datetime(2016, 7, 24, 12, 21, 0, microsecond = 13, tzinfo = pytz.utc),
+        '2016-07-24T12:20:00.025500/2016-07-24T12:21:00.000013Z',
+        ],
+    ])
+def test_dateperiod_get_isoformat(start, end, iso):
+    p = ioex.DatePeriod(start = start, end = end)
+    assert p.isoformat == iso

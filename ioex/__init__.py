@@ -72,3 +72,12 @@ class DatePeriod(object):
         if not (end is None or type(end) is datetime.datetime):
             raise TypeError()
         self._end = end
+
+    @property
+    def isoformat(self):
+        if self.start is None or self.end is None:
+            raise ValueError('both start and end must be set')
+        return '%s/%s' % (
+                self.start.isoformat().replace('+00:00', 'Z'), 
+                self.end.isoformat().replace('+00:00', 'Z'), 
+                )

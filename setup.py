@@ -14,5 +14,5 @@ setup(
     keywords = [],
     classifiers = [],
     scripts = glob.glob('scripts/*'),
-    tests_require = ['pytest']
+    tests_require = ['pytest', 'pytz']
     )
