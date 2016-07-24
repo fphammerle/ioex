@@ -6,6 +6,10 @@ import os
 import re
 import sys
 import threading
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 class UnsupportedLocaleSettingError(locale.Error):
     pass
@@ -50,6 +54,8 @@ def int_input_with_default(prompt, default):
         return None
 
 class DatePeriod(object):
+
+    yaml_tag = u'!period'
 
     _timestamp_iso_format = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?(Z|[-\+]\d{2}:\d{2})?'
     _timeperiod_iso_format = r'(?P<start>%(t)s)\/(?P<end>%(t)s)' % {'t': _timestamp_iso_format}
@@ -110,3 +116,25 @@ class DatePeriod(object):
         return (type(self) == type(other)
             and self.start == other.start
             and self.end == other.end)
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(**loader.construct_mapping(node))
+
+    @classmethod
+    def to_yaml(cls, dumper, period):
+        return dumper.represent_mapping(
+            tag = cls.yaml_tag,
+            mapping = {
+                'start': period.start,
+                'end': period.end,
+                },
+            # represent datetime objects with !timestamp tag
+            flow_style = False,
+            )
+
+if yaml:
+    yaml.add_representer(DatePeriod, DatePeriod.to_yaml)
+    yaml.SafeDumper.add_representer(DatePeriod, DatePeriod.to_yaml)
+    yaml.add_constructor(u'!period', DatePeriod.from_yaml)
+    yaml.SafeLoader.add_constructor(u'!period', DatePeriod.from_yaml)
