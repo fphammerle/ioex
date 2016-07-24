@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import pytz
-import datetime
 yaml = pytest.importorskip('yaml')
+import datetime
+import pytz
 
 @pytest.mark.parametrize('source_object,yaml_string', [
     [datetime.datetime(2016, 7, 14, 13, 50, 4, 0), '2016-07-14 13:50:04\n...\n'],
