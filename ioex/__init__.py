@@ -1,6 +1,7 @@
 import os
 import sys
 import locale
+import datetime
 import threading
 import contextlib
 
@@ -45,3 +46,29 @@ def int_input_with_default(prompt, default):
         return int(s)
     else:
         return None
+
+class DatePeriod(object):
+
+    def __init__(self, start = None, end = None):
+        self.start = start
+        self.end = end
+
+    @property
+    def start(self):
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        if not (start is None or type(start) is datetime.datetime):
+            raise TypeError()
+        self._start = start
+
+    @property
+    def end(self):
+        return self._end
+
+    @end.setter
+    def end(self, end):
+        if not (end is None or type(end) is datetime.datetime):
+            raise TypeError()
+        self._end = end
