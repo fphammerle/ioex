@@ -27,7 +27,7 @@ def construct_yaml_timestamp(loader, node):
                 loaded_dt = loaded_dt.astimezone(timezone)
     return loaded_dt
 
-def add_yaml_timestamp_constructor(loader, tag = u'tag:yaml.org,2002:timestamp'):
+def register_yaml_timestamp_constructor(loader, tag = u'tag:yaml.org,2002:timestamp'):
     loader.add_constructor(tag, construct_yaml_timestamp)
 
 class Period(object):
@@ -117,12 +117,10 @@ class Period(object):
             ]))
 
     @classmethod
-    def add_yaml_constructor(cls, loader, tag = yaml_tag):
-        add_yaml_timestamp_constructor(loader)
+    def register_yaml_constructor(cls, loader, tag = yaml_tag):
+        register_yaml_timestamp_constructor(loader)
         loader.add_constructor(tag, cls.from_yaml)
 
-if yaml:
-    yaml.add_representer(Period, Period.to_yaml)
-    yaml.SafeDumper.add_representer(Period, Period.to_yaml)
-    Period.add_yaml_constructor(yaml.Loader)
-    Period.add_yaml_constructor(yaml.SafeLoader)
+    @classmethod
+    def register_yaml_representer(cls, dumper):
+        dumper.add_representer(cls, cls.to_yaml)

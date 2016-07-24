@@ -47,11 +47,13 @@ yaml = pytest.importorskip('yaml')
     ])
 def test_from_yaml(expected_period, yaml_string, loader):
     loader_copy = copy.deepcopy(loader)
+    ioex.datetimeex.Period.register_yaml_constructor(loader_copy)
     loaded_period = yaml.load(yaml_string, Loader = loader_copy)
     assert expected_period == loaded_period
     assert expected_period.start.utcoffset() == loaded_period.start.utcoffset()
     assert expected_period.end.utcoffset() == loaded_period.end.utcoffset()
 
+@pytest.mark.parametrize(('dumper'), [yaml.Dumper, yaml.SafeDumper])
 @pytest.mark.parametrize(('period', 'yaml_string'), [
     [
         ioex.datetimeex.Period(
@@ -75,6 +77,7 @@ def test_from_yaml(expected_period, yaml_string, loader):
         '!period\nend: 2016-07-24 12:21:00.000013+00:00\nstart: 2016-07-24 12:20:00+01:00\n',
         ],
     ])
-def test_to_yaml(period, yaml_string):
-    assert yaml.dump(period) == yaml_string
-    assert yaml.safe_dump(period) == yaml_string
+def test_to_yaml(period, yaml_string, dumper):
+    dumper_copy = copy.deepcopy(dumper)
+    ioex.datetimeex.Period.register_yaml_representer(dumper_copy)
+    assert yaml.dump(period, Dumper = dumper_copy) == yaml_string

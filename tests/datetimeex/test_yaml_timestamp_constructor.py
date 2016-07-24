@@ -20,7 +20,7 @@ import pytz
     ])
 def test_from_yaml(yaml_string, expected_timestamp, loader):
     loader_copy = copy.deepcopy(loader)
-    ioex.datetimeex.add_yaml_timestamp_constructor(loader_copy)
+    ioex.datetimeex.register_yaml_timestamp_constructor(loader_copy)
     loaded_timestamp = yaml.load(yaml_string, Loader = loader_copy)
     assert loaded_timestamp == expected_timestamp
     assert loaded_timestamp.utcoffset() == expected_timestamp.utcoffset()
@@ -31,7 +31,7 @@ def test_from_yaml(yaml_string, expected_timestamp, loader):
     ])
 def test_from_yaml_tag(yaml_string, tag, expected_timestamp):
     loader = copy.deepcopy(yaml.SafeLoader)
-    ioex.datetimeex.add_yaml_timestamp_constructor(loader, tag = tag)
+    ioex.datetimeex.register_yaml_timestamp_constructor(loader, tag = tag)
     assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
 
 @pytest.mark.parametrize(('yaml_string', 'expected_timestamp'), [
@@ -40,7 +40,7 @@ def test_from_yaml_tag(yaml_string, tag, expected_timestamp):
     ])
 def test_from_yaml_repeat(yaml_string, expected_timestamp):
     loader = copy.deepcopy(yaml.SafeLoader)
-    ioex.datetimeex.add_yaml_timestamp_constructor(loader)
+    ioex.datetimeex.register_yaml_timestamp_constructor(loader)
     assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
-    ioex.datetimeex.add_yaml_timestamp_constructor(loader)
+    ioex.datetimeex.register_yaml_timestamp_constructor(loader)
     assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
