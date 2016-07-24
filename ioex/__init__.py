@@ -105,3 +105,8 @@ class DatePeriod(object):
         attr = match.groupdict()
         self.start = dateutil.parser.parse(attr['start'])
         self.end = dateutil.parser.parse(attr['end'])
+
+    def __eq__(self, other):
+        return (type(self) == type(other)
+            and self.start == other.start
+            and self.end == other.end)

@@ -167,3 +167,39 @@ def test_dateperiod_set_isoformat_fail(iso):
     p = ioex.DatePeriod()
     with pytest.raises(ValueError):
         p.isoformat = iso
+
+@pytest.mark.parametrize(('a', 'b'), [
+    [
+        ioex.DatePeriod(
+            start = datetime.datetime(2016, 7, 24, 12, 21, 0),
+            end = datetime.datetime(2016, 7, 24, 12, 22, 13),
+            ),
+        ioex.DatePeriod(
+            start = datetime.datetime(2016, 7, 24, 12, 21, 0, 0),
+            end = datetime.datetime(2016, 7, 24, 12, 22, 13, 0),
+            ),
+        ],
+    [
+        ioex.DatePeriod(
+            start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
+            end = datetime.datetime(2016, 7, 24, 12, 22, 13),
+            ),
+        ioex.DatePeriod(
+            start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
+            end = datetime.datetime(2016, 7, 24, 12, 22, 13),
+            ),
+        ],
+    [
+        ioex.DatePeriod(
+            start = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 12, 21, 0)),
+            end = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 12, 22, 13)),
+            ),
+        ioex.DatePeriod(
+            start = pytz.timezone('Europe/London').localize(datetime.datetime(2016, 7, 24, 11, 21, 0)),
+            end = pytz.timezone('Europe/Vienna').localize(datetime.datetime(2016, 7, 24, 13, 22, 13)),
+            ),
+        ],
+    ])
+def test_eq(a, b):
+    assert a == b
+    assert b == a
