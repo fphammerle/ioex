@@ -36,7 +36,7 @@ yaml = pytest.importorskip('yaml')
         '!period\nstart: 2016-07-24T12:20:00.025500\nend: 2016-07-24T12:21:00.000013Z',
         ],
     ])
-def test_dateperiod_from_yaml(period, yaml_string):
+def test_from_yaml(period, yaml_string):
     if period.start.tzinfo or period.end.tzinfo: 
         pytest.xfail('pyyaml ignores timezones when loading timestamps')
     assert period == yaml.load(yaml_string)
@@ -65,6 +65,6 @@ def test_dateperiod_from_yaml(period, yaml_string):
         '!period\nend: 2016-07-24 12:21:00.000013+00:00\nstart: 2016-07-24 12:20:00+01:00\n',
         ],
     ])
-def test_dateperiod_to_yaml(period, yaml_string):
+def test_to_yaml(period, yaml_string):
     assert yaml.dump(period) == yaml_string
     assert yaml.safe_dump(period) == yaml_string

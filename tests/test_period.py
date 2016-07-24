@@ -11,7 +11,7 @@ import datetime
     [datetime.datetime(2016, 7, 24, 12, 21), None],
     [None, None],
     ])
-def test_dateperiod_init_start_end(start, end):
+def test_init_start_end(start, end):
     p = ioex.Period(start = start, end = end)
     assert p.start == start
     assert p.end == end
@@ -20,7 +20,7 @@ def test_dateperiod_init_start_end(start, end):
     [';-)', datetime.datetime(2016, 7, 24, 12, 22)],
     [datetime.datetime(2016, 7, 24, 12, 22), ';-)'],
     ])
-def test_dateperiod_init_start_end_fail(start, end):
+def test_init_start_end_fail(start, end):
     with pytest.raises(TypeError):
         ioex.Period(start = start, end = end)
 
@@ -31,7 +31,7 @@ def test_dateperiod_init_start_end_fail(start, end):
         '2016-07-24T12:20:00.0255/2016-07-24T12:21:00.13Z',
         ],
     ])
-def test_dateperiod_init_isoformat(start, end, iso):
+def test_init_isoformat(start, end, iso):
     p = ioex.Period(isoformat = iso)
     assert p.start == start
     assert p.end == end
@@ -51,7 +51,7 @@ def test_dateperiod_init_isoformat(start, end, iso):
         'isoformat': '2016-07-24T12:20:00Z/2016-07-24T12:21:00Z',
         },
     ])
-def test_dateperiod_init_param_fail(params):
+def test_init_param_fail(params):
     with pytest.raises(StandardError):
         ioex.Period(**params)
 
@@ -59,7 +59,7 @@ def test_dateperiod_init_param_fail(params):
     datetime.datetime(2016, 7, 24, 12, 21),
     None,
     ])
-def test_dateperiod_set_start(start):
+def test_set_start(start):
     p = ioex.Period()
     assert p.start is None
     p.start = start
@@ -68,7 +68,7 @@ def test_dateperiod_set_start(start):
 @pytest.mark.parametrize(('start'), [
     ':-/',
     ])
-def test_dateperiod_set_start_fail(start):
+def test_set_start_fail(start):
     p = ioex.Period()
     with pytest.raises(TypeError):
         p.start = start
@@ -77,7 +77,7 @@ def test_dateperiod_set_start_fail(start):
     datetime.datetime(2016, 7, 24, 12, 21),
     None,
     ])
-def test_dateperiod_set_end(end):
+def test_set_end(end):
     p = ioex.Period()
     assert p.end is None
     p.end = end
@@ -86,7 +86,7 @@ def test_dateperiod_set_end(end):
 @pytest.mark.parametrize(('end'), [
     ':-/',
     ])
-def test_dateperiod_set_end_fail(end):
+def test_set_end_fail(end):
     p = ioex.Period()
     with pytest.raises(TypeError):
         p.end = end
@@ -118,7 +118,7 @@ def test_dateperiod_set_end_fail(end):
         '2016-07-24T12:20:00.025500/2016-07-24T12:21:00.000013Z',
         ],
     ])
-def test_dateperiod_get_isoformat(start, end, iso):
+def test_get_isoformat(start, end, iso):
     p = ioex.Period(start = start, end = end)
     assert p.isoformat == iso
 
@@ -154,7 +154,7 @@ def test_dateperiod_get_isoformat(start, end, iso):
         '2016-07-24T12:20:00.0255/2016-07-24T12:21:00.13Z',
         ],
     ])
-def test_dateperiod_set_isoformat(start, end, iso):
+def test_set_isoformat(start, end, iso):
     p = ioex.Period()
     p.isoformat = iso
     assert p.start == start
@@ -163,7 +163,7 @@ def test_dateperiod_set_isoformat(start, end, iso):
 @pytest.mark.parametrize(('iso'), [
     '2016-07-24T12:20:0<INVALID>0.0255/2016-07-24T12:21:00.13Z',
     ])
-def test_dateperiod_set_isoformat_fail(iso):
+def test_set_isoformat_fail(iso):
     p = ioex.Period()
     with pytest.raises(ValueError):
         p.isoformat = iso
