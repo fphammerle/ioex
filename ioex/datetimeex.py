@@ -30,6 +30,55 @@ def construct_yaml_timestamp(loader, node):
 def register_yaml_timestamp_constructor(loader, tag = u'tag:yaml.org,2002:timestamp'):
     loader.add_constructor(tag, construct_yaml_timestamp)
 
+class Duration(object):
+
+    yaml_tag = u'!duration'
+
+    def __init__(self, years = 0):
+        self.years = years
+
+    @property
+    def years(self):
+        return self._years
+
+    @years.setter
+    def years(self, years):
+        if not type(years) is int:
+            raise TypeError('expected int, %r given' % years)
+        elif years < 0:
+            raise ValueError('number of years must be >= 0, %r given' % years)
+        else:
+            self._years = years
+
+    @property
+    def isoformat(self):
+        return 'P%dY' % self.years
+
+    def __eq__(self, other):
+        return (type(self) == type(other)
+                and self.years == other.years)
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(**loader.construct_mapping(node))
+
+    @classmethod
+    def register_yaml_constructor(cls, loader, tag = yaml_tag):
+        loader.add_constructor(tag, cls.from_yaml)
+
+    @classmethod
+    def to_yaml(cls, dumper, duration, tag = yaml_tag):
+        return dumper.represent_mapping(
+            tag = tag,
+            mapping = {k: v for k, v in {
+                'years': duration.years,
+                }.items() if v != 0},
+            )
+
+    @classmethod
+    def register_yaml_representer(cls, dumper):
+        dumper.add_representer(cls, cls.to_yaml)
+
 class Period(object):
 
     yaml_tag = u'!period'
