@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import copy
 import ioex.datetimeex
 yaml = pytest.importorskip('yaml')
 
@@ -36,9 +35,12 @@ yaml = pytest.importorskip('yaml')
     ['{kï: valü}', {u'kï': u'valü'}],
     ])
 def test_to_yaml(yaml_string, expected_object, loader):
-    loader_copy = copy.deepcopy(loader)
-    ioex.register_yaml_str_as_unicode_constructor(loader_copy)
-    generated_object = yaml.load(yaml_string, Loader = loader_copy)
+    # create subclass so call to class method does not interfere with other tests
+    # see yaml.BaseConstructor.add_constructor()
+    class TestLoader(loader):
+        pass
+    ioex.register_yaml_str_as_unicode_constructor(TestLoader)
+    generated_object = yaml.load(yaml_string, Loader = TestLoader)
     assert type(expected_object) == type(generated_object)
     assert expected_object == generated_object
     if type(expected_object) is list:

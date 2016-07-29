@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import copy
 from ioex.datetimeex import Duration
 yaml = pytest.importorskip('yaml')
 
@@ -13,9 +12,10 @@ yaml = pytest.importorskip('yaml')
     [Duration(years = 0),  '!duration {}'],
     ])
 def test_from_yaml(expected_duration, yaml_string, loader):
-    loader_copy = copy.deepcopy(loader)
-    Duration.register_yaml_constructor(loader_copy)
-    loaded_duration = yaml.load(yaml_string, Loader = loader_copy)
+    class TestLoader(loader):
+        pass
+    Duration.register_yaml_constructor(TestLoader)
+    loaded_duration = yaml.load(yaml_string, Loader = TestLoader)
     assert expected_duration == loaded_duration
 
 @pytest.mark.parametrize(('loader'), [yaml.Loader, yaml.SafeLoader])
@@ -23,10 +23,11 @@ def test_from_yaml(expected_duration, yaml_string, loader):
     [Duration(years = 2),  '!dur\nyears: 2', '!dur'],
     [Duration(years = 0), '!duration_tag {}', '!duration_tag'],
     ])
-def test_from_yaml(expected_duration, yaml_string, tag, loader):
-    loader_copy = copy.deepcopy(loader)
-    Duration.register_yaml_constructor(loader_copy, tag = tag)
-    loaded_duration = yaml.load(yaml_string, Loader = loader_copy)
+def test_from_yaml_tag(expected_duration, yaml_string, tag, loader):
+    class TestLoader(loader):
+        pass
+    Duration.register_yaml_constructor(TestLoader, tag = tag)
+    loaded_duration = yaml.load(yaml_string, Loader = TestLoader)
     assert expected_duration == loaded_duration
 
 @pytest.mark.parametrize(('dumper'), [yaml.Dumper, yaml.SafeDumper])
@@ -35,6 +36,7 @@ def test_from_yaml(expected_duration, yaml_string, tag, loader):
     [Duration(years = 32), '!duration\nyears: 32\n'],
     ])
 def test_to_yaml(duration, yaml_string, dumper):
-    dumper_copy = copy.deepcopy(dumper)
-    Duration.register_yaml_representer(dumper_copy)
-    assert yaml.dump(duration, Dumper = dumper_copy, default_flow_style = False) == yaml_string
+    class TestDumper(dumper):
+        pass
+    Duration.register_yaml_representer(TestDumper)
+    assert yaml.dump(duration, Dumper = TestDumper, default_flow_style = False) == yaml_string

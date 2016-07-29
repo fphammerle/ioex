@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import copy
 import ioex.datetimeex
 yaml = pytest.importorskip('yaml')
 
@@ -19,11 +18,14 @@ yaml = pytest.importorskip('yaml')
     [{u'⚕': u'☤'}, '{⚕: ☤}\n', {'allow_unicode': True}],
     ])
 def test_to_yaml(unicode_string, expected_yaml_string, dump_params, dumper):
-    dumper_copy = copy.deepcopy(dumper)
-    ioex.register_yaml_unicode_as_str_representer(dumper_copy)
+    # create subclass so call to class method does not interfere with other tests
+    # see yaml.BaseRepresenter.add_representer()
+    class TestDumper(dumper):
+        pass
+    ioex.register_yaml_unicode_as_str_representer(TestDumper)
     generated_yaml_string = yaml.dump(
             unicode_string,
-            Dumper = dumper_copy,
+            Dumper = TestDumper,
             default_flow_style = True,
             **dump_params
             )

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import copy
 import datetime
 import ioex.datetimeex
 import pytz
@@ -46,9 +45,10 @@ yaml = pytest.importorskip('yaml')
         ],
     ])
 def test_from_yaml(expected_period, yaml_string, loader):
-    loader_copy = copy.deepcopy(loader)
-    ioex.datetimeex.Period.register_yaml_constructor(loader_copy)
-    loaded_period = yaml.load(yaml_string, Loader = loader_copy)
+    class TestLoader(loader):
+        pass
+    ioex.datetimeex.Period.register_yaml_constructor(TestLoader)
+    loaded_period = yaml.load(yaml_string, Loader = TestLoader)
     assert expected_period == loaded_period
     assert expected_period.start.utcoffset() == loaded_period.start.utcoffset()
     assert expected_period.end.utcoffset() == loaded_period.end.utcoffset()
@@ -78,6 +78,7 @@ def test_from_yaml(expected_period, yaml_string, loader):
         ],
     ])
 def test_to_yaml(period, yaml_string, dumper):
-    dumper_copy = copy.deepcopy(dumper)
-    ioex.datetimeex.Period.register_yaml_representer(dumper_copy)
-    assert yaml.dump(period, Dumper = dumper_copy) == yaml_string
+    class TestDumper(dumper):
+        pass
+    ioex.datetimeex.Period.register_yaml_representer(TestDumper)
+    assert yaml.dump(period, Dumper = TestDumper) == yaml_string

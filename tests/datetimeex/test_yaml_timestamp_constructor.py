@@ -2,7 +2,6 @@
 import pytest
 
 yaml = pytest.importorskip('yaml')
-import copy
 import datetime
 import dateutil.tz.tz
 import ioex.datetimeex
@@ -19,9 +18,12 @@ import pytz
     ['2016-07-14 13:50:04-07:00', pytz.timezone('US/Pacific').localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
     ])
 def test_from_yaml(yaml_string, expected_timestamp, loader):
-    loader_copy = copy.deepcopy(loader)
-    ioex.datetimeex.register_yaml_timestamp_constructor(loader_copy)
-    loaded_timestamp = yaml.load(yaml_string, Loader = loader_copy)
+    # create subclass so call to class method does not interfere with other tests
+    # see yaml.BaseConstructor.add_constructor()
+    class TestLoader(loader):
+        pass
+    ioex.datetimeex.register_yaml_timestamp_constructor(TestLoader)
+    loaded_timestamp = yaml.load(yaml_string, Loader = TestLoader)
     assert loaded_timestamp == expected_timestamp
     assert loaded_timestamp.utcoffset() == expected_timestamp.utcoffset()
 
@@ -30,17 +32,23 @@ def test_from_yaml(yaml_string, expected_timestamp, loader):
     ['!datetime 2016-07-14 13:50:04Z', '!datetime', pytz.utc.localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
     ])
 def test_from_yaml_tag(yaml_string, tag, expected_timestamp):
-    loader = copy.deepcopy(yaml.SafeLoader)
-    ioex.datetimeex.register_yaml_timestamp_constructor(loader, tag = tag)
-    assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
+    # create subclass so call to class method does not interfere with other tests
+    # see yaml.BaseConstructor.add_constructor()
+    class TestLoader(yaml.SafeLoader):
+        pass
+    ioex.datetimeex.register_yaml_timestamp_constructor(TestLoader, tag = tag)
+    assert yaml.load(yaml_string, Loader = TestLoader) == expected_timestamp
 
 @pytest.mark.parametrize(('yaml_string', 'expected_timestamp'), [
     ['2016-07-14 13:50:04', datetime.datetime(2016, 7, 14, 13, 50, 4, 0)],
     ['2016-07-14 13:50:04Z', pytz.utc.localize(datetime.datetime(2016, 7, 14, 13, 50, 4, 0))],
     ])
 def test_from_yaml_repeat(yaml_string, expected_timestamp):
-    loader = copy.deepcopy(yaml.SafeLoader)
-    ioex.datetimeex.register_yaml_timestamp_constructor(loader)
-    assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
-    ioex.datetimeex.register_yaml_timestamp_constructor(loader)
-    assert yaml.load(yaml_string, Loader = loader) == expected_timestamp
+    # create subclass so call to class method does not interfere with other tests
+    # see yaml.BaseRepresenter.add_representer()
+    class TestLoader(yaml.SafeLoader):
+        pass
+    ioex.datetimeex.register_yaml_timestamp_constructor(TestLoader)
+    assert yaml.load(yaml_string, Loader = TestLoader) == expected_timestamp
+    ioex.datetimeex.register_yaml_timestamp_constructor(TestLoader)
+    assert yaml.load(yaml_string, Loader = TestLoader) == expected_timestamp
