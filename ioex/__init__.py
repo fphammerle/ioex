@@ -43,3 +43,9 @@ def int_input_with_default(prompt, default):
         return int(s)
     else:
         return None
+
+def yaml_represent_unicode_as_str(dumper, unicode_string):
+    return dumper.represent_scalar(u'tag:yaml.org,2002:str', unicode_string)
+
+def register_yaml_unicode_as_str_representer(dumper):
+    dumper.add_representer(unicode, yaml_represent_unicode_as_str)

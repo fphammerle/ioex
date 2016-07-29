@@ -2,10 +2,6 @@ import datetime
 import dateutil.parser
 import dateutil.tz.tz
 import re
-try:
-    import yaml
-except ImportError:
-    yaml = None
 
 def construct_yaml_timestamp(loader, node):
     loaded_dt = loader.construct_yaml_timestamp(node)
