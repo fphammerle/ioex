@@ -1,7 +1,13 @@
 import contextlib
+import difflib
+import ioex.shell
 import locale
 import readline
 import threading
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 class UnsupportedLocaleSettingError(locale.Error):
     pass
@@ -56,3 +62,31 @@ def yaml_construct_str_as_unicode(loader, node):
 
 def register_yaml_str_as_unicode_constructor(loader):
     loader.add_constructor(u'tag:yaml.org,2002:str', yaml_construct_str_as_unicode)
+
+yaml_diff_colors = {
+    ' ': ioex.shell.TextColor.default,
+    '+': ioex.shell.TextColor.green,
+    '-': ioex.shell.TextColor.red,
+    '?': ioex.shell.TextColor.yellow,
+    }
+
+def yaml_diff(a, b, dumper = None, colors = False):
+    if dumper is None:
+        class DiffDumper(yaml.Dumper):
+            pass
+        register_yaml_unicode_as_str_representer(DiffDumper)
+        dumper = DiffDumper
+    def to_yaml(data):
+        return yaml.dump(
+                data,
+                Dumper = dumper,
+                default_flow_style = False,
+                allow_unicode = True,
+                ).decode('utf-8')
+    diff_lines = difflib.ndiff(
+        to_yaml(a).splitlines(True),
+        to_yaml(b).splitlines(True),
+        )
+    if colors:
+        diff_lines = [u'%s%s%s' % (yaml_diff_colors[l[0]], l, ioex.shell.TextColor.default) for l in diff_lines]
+    return u''.join(diff_lines)
