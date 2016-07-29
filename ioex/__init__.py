@@ -49,3 +49,10 @@ def yaml_represent_unicode_as_str(dumper, unicode_string):
 
 def register_yaml_unicode_as_str_representer(dumper):
     dumper.add_representer(unicode, yaml_represent_unicode_as_str)
+
+def yaml_construct_str_as_unicode(loader, node):
+    string = loader.construct_scalar(node)
+    return string if type(string) is unicode else string.decode('utf-8')
+
+def register_yaml_str_as_unicode_constructor(loader):
+    loader.add_constructor(u'tag:yaml.org,2002:str', yaml_construct_str_as_unicode)
