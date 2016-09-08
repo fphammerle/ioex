@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
+
+import sys
+import yaml
+
+def reyaml(input_path, output_path):
+
+    if input_path:
+        with open(input_path, 'r') as input_file:
+            input_yaml = input_file.read()
+    else:
+        input_yaml = sys.stdin.read()
+
+    output_yaml = yaml.dump(
+        yaml.load(input_yaml),
+        default_flow_style = False,
+        )
+
+    if output_path:
+        with open(output_path, 'w') as output_file:
+            output_file.write(output_yaml)
+    else:
+        sys.stdout.write(output_yaml)
+
+def _init_argparser():
+
+    import argparse
+    argparser = argparse.ArgumentParser(description = None)
+    argparser.add_argument('-i', dest = 'input_path')
+    argparser.add_argument('-o', dest = 'output_path')
+    return argparser
+
+def main(argv):
+
+    argparser = _init_argparser()
+    try:
+        import argcomplete
+        argcomplete.autocomplete(argparser)
+    except ImportError:
+        pass
+    args = argparser.parse_args(argv)
+
+    reyaml(**vars(args))
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
