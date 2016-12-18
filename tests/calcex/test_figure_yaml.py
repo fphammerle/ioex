@@ -4,6 +4,17 @@ import pytest
 from ioex.calcex import Figure, UnitMismatchError
 yaml = pytest.importorskip('yaml')
 
+@pytest.mark.parametrize(('yaml_loader'), [yaml.Loader, yaml.SafeLoader])
+@pytest.mark.parametrize(('figure_yaml', 'expected_figure'), [
+    ['!fig {value: null, unit: null}', Figure()],
+    ['!fig {value: 123.4, unit: null}', Figure(123.4)],
+    ['!fig {value: [1, 2], unit: null}', Figure([1, 2])],
+])
+def test_register_yaml_constructor(figure_yaml, expected_figure, yaml_loader):
+    class TestLoader(yaml_loader):
+        pass
+    Figure.register_yaml_constructor(TestLoader, tag = '!fig')
+    assert expected_figure == yaml.load(figure_yaml, Loader = TestLoader)
 
 @pytest.mark.parametrize(('yaml_dumper'), [yaml.Dumper, yaml.SafeDumper])
 @pytest.mark.parametrize(('figure'), [

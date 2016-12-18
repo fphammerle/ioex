@@ -49,11 +49,19 @@ class Figure(object):
             return '{} {}'.format(self.value, self.unit)
 
     @classmethod
-    def to_yaml(cls, dumper, figure, tag = yaml_tag):
+    def from_yaml(cls, loader, node):
+        return cls(**loader.construct_mapping(node))
+
+    @classmethod
+    def register_yaml_constructor(cls, loader, tag=yaml_tag):
+        loader.add_constructor(tag, cls.from_yaml)
+
+    @classmethod
+    def to_yaml(cls, dumper, figure, tag=yaml_tag):
         return dumper.represent_mapping(
-            tag = tag,
-            mapping = {'value': figure.value, 'unit': figure.unit},
-            )
+            tag=tag,
+            mapping={'value': figure.value, 'unit': figure.unit},
+        )
 
     @classmethod
     def register_yaml_representer(cls, dumper):
