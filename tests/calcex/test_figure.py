@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import copy
 from ioex.calcex import Figure, UnitMismatchError
 
 

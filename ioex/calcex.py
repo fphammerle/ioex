@@ -1,8 +1,8 @@
 import copy
-# try:
-#     import yaml
-# except ImportError:
-#     yaml = None
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 
 class UnitMismatchError(ValueError):
@@ -47,6 +47,17 @@ class Figure(object):
             return '? {}'.format(self.unit)
         else:
             return '{} {}'.format(self.value, self.unit)
+
+    @classmethod
+    def to_yaml(cls, dumper, figure, tag = yaml_tag):
+        return dumper.represent_mapping(
+            tag = tag,
+            mapping = {'value': figure.value, 'unit': figure.unit},
+            )
+
+    @classmethod
+    def register_yaml_representer(cls, dumper):
+        dumper.add_representer(cls, cls.to_yaml)
 
     def __eq__(self, other):
         return isinstance(self, type(other)) and vars(self) == vars(other)
