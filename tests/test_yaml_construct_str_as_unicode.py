@@ -15,9 +15,9 @@ yaml = pytest.importorskip('yaml')
     # True
     ['item', u'item'],
     ['itäm', u'itäm'],
-    ['it\xc3\xa4m', u'itäm'],
-    ['"it\xc3\xa4m"', u'itäm'],
-    [r'it\xE4m', ur'it\xE4m'],
+    [b'it\xc3\xa4m', u'itäm'],
+    [b'"it\xc3\xa4m"', u'itäm'],
+    [r'it\xE4m', u'it\\xE4m'],
     ['"itäm"', u'itäm'],
     [r'"it\xc3\xa4m"', u'it\xc3\xa4m'], # see comment above
     # unicode strings

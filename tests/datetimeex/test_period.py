@@ -52,7 +52,7 @@ def test_init_isoformat(start, end, iso):
         },
     ])
 def test_init_param_fail(params):
-    with pytest.raises(StandardError):
+    with pytest.raises(AttributeError):
         ioex.datetimeex.Period(**params)
 
 @pytest.mark.parametrize(('start'), [

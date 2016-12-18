@@ -21,8 +21,8 @@ def setlocale(temporary_locale):
         try:
             try:
                 yield locale.setlocale(locale.LC_ALL, temporary_locale)
-            except locale.Error, ex:
-                if ex.message == 'unsupported locale setting':
+            except locale.Error as ex:
+                if str(ex) == 'unsupported locale setting':
                     raise UnsupportedLocaleSettingError(temporary_locale)
                 else:
                     raise ex
@@ -54,11 +54,17 @@ def yaml_represent_unicode_as_str(dumper, unicode_string):
     return dumper.represent_scalar(u'tag:yaml.org,2002:str', unicode_string)
 
 def register_yaml_unicode_as_str_representer(dumper):
-    dumper.add_representer(unicode, yaml_represent_unicode_as_str)
+    try:
+        dumper.add_representer(unicode, yaml_represent_unicode_as_str)
+    except NameError: # python3
+        pass
 
 def yaml_construct_str_as_unicode(loader, node):
     string = loader.construct_scalar(node)
-    return string if type(string) is unicode else string.decode('utf-8')
+    try:
+        return string if type(string) is unicode else string.decode('utf-8')
+    except NameError: # python3
+        return string
 
 def register_yaml_str_as_unicode_constructor(loader):
     loader.add_constructor(u'tag:yaml.org,2002:str', yaml_construct_str_as_unicode)
@@ -82,7 +88,7 @@ def yaml_diff(a, b, dumper = None, colors = False):
                 Dumper = dumper,
                 default_flow_style = False,
                 allow_unicode = True,
-                ).decode('utf-8')
+                )
     diff_lines = difflib.ndiff(
         to_yaml(a).splitlines(True),
         to_yaml(b).splitlines(True),

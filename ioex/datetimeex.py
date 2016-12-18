@@ -7,7 +7,7 @@ def construct_yaml_timestamp(loader, node):
     loaded_dt = loader.construct_yaml_timestamp(node)
     if type(loaded_dt) is datetime.datetime and loaded_dt.tzinfo is None:
         timezone_match = re.search(
-            ur'(Z|(?P<sign>[\+-])(?P<h>\d{2}):(?P<m>\d{2}))$',
+            r'(Z|(?P<sign>[\+-])(?P<h>\d{2}):(?P<m>\d{2}))$',
             loader.construct_yaml_str(node),
             )
         if timezone_match:

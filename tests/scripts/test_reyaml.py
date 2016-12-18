@@ -8,9 +8,9 @@ import subprocess
 script_path = os.path.realpath(os.path.join(__file__, '..', '..', '..', 'scripts', 'reyaml'))
 
 @pytest.mark.parametrize(('stdin', 'params', 'expected_stdout'), [
-    ['a: b\n', [], 'a: b\n'],
-    ['{a: b}\n', [], 'a: b\n'],
-    ['[a, b, c]\n', [], '- a\n- b\n- c\n'],
+    [b'a: b\n', [], b'a: b\n'],
+    [b'{a: b}\n', [], b'a: b\n'],
+    [b'[a, b, c]\n', [], b'- a\n- b\n- c\n'],
     ])
 def test_params(stdin, params, expected_stdout):
     p = subprocess.Popen(
@@ -24,7 +24,7 @@ def test_params(stdin, params, expected_stdout):
 def test_file_input(tmpdir):
     input_file = tmpdir.join('in')
     input_file.write('a: b')
-    assert 'a: b\n' == subprocess.check_output(
+    assert b'a: b\n' == subprocess.check_output(
             [script_path, '-i', input_file.strpath],
             )
 
@@ -36,9 +36,9 @@ def test_file_output(tmpdir):
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
             )
-    stdout, stderr = p.communicate('a: b')
-    assert stdout == ''
-    assert stderr == ''
+    stdout, stderr = p.communicate(b'a: b')
+    assert stdout == b''
+    assert stderr == b''
     assert 'a: b\n' == output_file.read()
 
 def test_file_input_output(tmpdir):
@@ -51,8 +51,8 @@ def test_file_input_output(tmpdir):
             stderr = subprocess.PIPE,
             )
     stdout, stderr = p.communicate()
-    assert stdout == ''
-    assert stderr == ''
+    assert stdout == b''
+    assert stderr == b''
     assert 'c: d\n' == output_file.read()
 
 def test_file_input_output_same(tmpdir):
@@ -64,6 +64,6 @@ def test_file_input_output_same(tmpdir):
             stderr = subprocess.PIPE,
             )
     stdout, stderr = p.communicate()
-    assert stdout == ''
-    assert stderr == ''
+    assert stdout == b''
+    assert stderr == b''
     assert 'b: 3\n' == io_file.read()

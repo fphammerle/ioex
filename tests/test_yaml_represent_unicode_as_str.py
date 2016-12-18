@@ -9,11 +9,9 @@ yaml = pytest.importorskip('yaml')
     [[u'item'], '[item]\n', {}],
     [[u'itäm'], '["it\\xE4m"]\n', {'allow_unicode': False}],
     [[u'itäm'], '[itäm]\n', {'allow_unicode': True}],
-    [[u'itäm'], u'[itäm]\n'.encode('utf-8'), {'allow_unicode': True}],
     [{u'key': u'value'}, '{key: value}\n', {}],
     [{u'kï': u'valü'}, '{"k\\xEF": "val\\xFC"}\n', {'allow_unicode': False}],
     [{u'kï': u'valü'}, '{kï: valü}\n', {'allow_unicode': True}],
-    [{u'kï': u'valü'}, u'{kï: valü}\n'.encode('utf-8'), {'allow_unicode': True}],
     [{u'kĕyĭ': u'可以'}, '{kĕyĭ: 可以}\n', {'allow_unicode': True}],
     [{u'⚕': u'☤'}, '{⚕: ☤}\n', {'allow_unicode': True}],
     ])

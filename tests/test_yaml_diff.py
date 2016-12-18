@@ -4,7 +4,6 @@ import pytest
 yaml = pytest.importorskip('yaml')
 import datetime
 import ioex.datetimeex
-import ioex.debug
 from ioex.shell import TextColor
 
 @pytest.mark.parametrize(('a', 'b', 'expected_diff_lines'), [
