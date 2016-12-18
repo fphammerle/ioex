@@ -34,6 +34,9 @@ class Figure(object):
     """ use property() instead of decorator to enable overriding """
     unit = property(get_unit, set_unit)
 
+    def __repr__(self):
+        return '{}(value = {!r}, unit = {})'.format(type(self).__name__, self.value, self.unit)
+
     def __str__(self):
         if self.value is None and self.unit is None:
             return '?'
@@ -43,3 +46,9 @@ class Figure(object):
             return '? {}'.format(self.unit)
         else:
             return '{} {}'.format(self.value, self.unit)
+
+    def __eq__(self, other):
+        return type(self) == type(other) and vars(self) == vars(other)
+
+    def __ne__(self, other):
+        return not (self == other)
