@@ -1,3 +1,4 @@
+import copy
 # try:
 #     import yaml
 # except ImportError:
@@ -48,7 +49,25 @@ class Figure(object):
             return '{} {}'.format(self.value, self.unit)
 
     def __eq__(self, other):
-        return type(self) == type(other) and vars(self) == vars(other)
+        return isinstance(self, type(other)) and vars(self) == vars(other)
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __add__(self, other):
+        assert isinstance(self, type(other))
+        assert not self.value is None
+        assert not other.value is None
+        if self.unit != other.unit:
+            raise UnitMismatchError('{} + {}'.format(self, other))
+        else:
+            return type(self)(value=self.value + other.value, unit=copy.deepcopy(self.unit))
+
+    def __sub__(self, other):
+        assert isinstance(self, type(other))
+        assert not self.value is None
+        assert not other.value is None
+        if self.unit != other.unit:
+            raise UnitMismatchError('{} - {}'.format(self, other))
+        else:
+            return type(self)(value=self.value - other.value, unit=copy.deepcopy(self.unit))

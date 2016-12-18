@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from ioex.calcex import Figure
+import copy
+from ioex.calcex import Figure, UnitMismatchError
 
 
 @pytest.mark.parametrize(('init_params', 'init_kwargs', 'expected_value', 'expected_unit'), [
@@ -72,13 +73,14 @@ def test_set_unit(unit):
 def test_str(figure, expected_string):
     assert expected_string == str(figure)
 
+
 @pytest.mark.parametrize(('a', 'b'), [
     [Figure(1, 'm'), Figure(1, 'm')],
 ])
 def test_eq(a, b):
     assert a == b
-    print(a == b, a != b)
     assert not (a != b)
+
 
 @pytest.mark.parametrize(('a', 'b'), [
     [Figure(1, 'm'), Figure(2, 'g')],
@@ -88,3 +90,63 @@ def test_eq(a, b):
 def test_neq(a, b):
     assert a != b
     assert not (a == b)
+
+
+@pytest.mark.parametrize(('a', 'b', 'expected_sum'), [
+    [Figure(1, 'm'), Figure(2, 'm'), Figure(3, 'm')],
+    [Figure(-2, 'l'), Figure(-4, 'l'), Figure(-6, 'l')],
+    [Figure(-1), Figure(3), Figure(2, None)],
+])
+def test_add(a, b, expected_sum):
+    assert expected_sum == a + b
+
+
+@pytest.mark.parametrize(('a', 'b'), [
+    [Figure(1, 'm'), Figure(2, 'l')],
+    [Figure(-2, 'l'), Figure(-4, None)],
+])
+def test_add_unit_mismatch(a, b):
+    with pytest.raises(UnitMismatchError):
+        a + b
+
+
+def test_add_persistent():
+    a = Figure([1], ['m'])
+    b = Figure([2], ['m'])
+    s = a + b
+    assert Figure([1, 2], ['m']) == s
+    a.value[0] = 3
+    a.unit[0] = 'g'
+    b.value[0] = 4
+    b.unit[0] = 'l'
+    assert Figure([1, 2], ['m']) == s
+
+
+@pytest.mark.parametrize(('a', 'b', 'expected_sum'), [
+    [Figure(1, 'm'), Figure(2, 'm'), Figure(-1, 'm')],
+    [Figure(-2, 'l'), Figure(-4, 'l'), Figure(2, 'l')],
+    [Figure(-1), Figure(3), Figure(-4, None)],
+])
+def test_sub(a, b, expected_sum):
+    assert expected_sum == a - b
+
+
+@pytest.mark.parametrize(('a', 'b'), [
+    [Figure(1, 'm'), Figure(2, 'l')],
+    [Figure(-2, 'l'), Figure(-4, None)],
+])
+def test_sub_unit_mismatch(a, b):
+    with pytest.raises(UnitMismatchError):
+        a - b
+
+
+def test_sub_persistent():
+    a = Figure(1, ['m'])
+    b = Figure(2, ['m'])
+    d = a - b
+    assert Figure(-1, ['m']) == d
+    a.value = 3
+    a.unit[0] = 'g'
+    b.value = 4
+    b.unit[0] = 'l'
+    assert Figure(-1, ['m']) == d
