@@ -99,3 +99,12 @@ class Figure(object):
             return type(self)(value=self.value * factor.value, unit=self.unit)
         else:
             return self * Figure(value=factor, unit=None)
+
+    def __div__(self, divisor):
+        if isinstance(divisor, Figure):
+            assert not self.value is None
+            assert not divisor.value is None
+            assert divisor.unit is None
+            return type(self)(value=self.value / divisor.value, unit=self.unit)
+        else:
+            return self / Figure(value=divisor, unit=None)
