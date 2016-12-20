@@ -14,14 +14,14 @@ class Figure(object):
     yaml_tag = u"!figure"
 
     def __init__(self, value=None, unit=None):
-        self._value = value
-        self._unit = unit
+        self.value = value
+        self.unit = unit
 
     def get_value(self):
         return self._value
 
     def set_value(self, value):
-        self._value = value
+        self._value = copy.deepcopy(value)
 
     """ use property() instead of decorator to enable overriding """
     value = property(get_value, set_value)
@@ -30,7 +30,7 @@ class Figure(object):
         return self._unit
 
     def set_unit(self, unit):
-        self._unit = unit
+        self._unit = copy.deepcopy(unit)
 
     """ use property() instead of decorator to enable overriding """
     unit = property(get_unit, set_unit)
@@ -50,7 +50,7 @@ class Figure(object):
 
     @classmethod
     def from_yaml(cls, loader, node):
-        return cls(**loader.construct_mapping(node))
+        return cls(**loader.construct_mapping(node, deep=True))
 
     @classmethod
     def register_yaml_constructor(cls, loader, tag=yaml_tag):
@@ -80,7 +80,7 @@ class Figure(object):
         if self.unit != other.unit:
             raise UnitMismatchError('{} + {}'.format(self, other))
         else:
-            return type(self)(value=self.value + other.value, unit=copy.deepcopy(self.unit))
+            return type(self)(value=self.value + other.value, unit=self.unit)
 
     def __sub__(self, other):
         assert isinstance(self, type(other))
@@ -89,4 +89,4 @@ class Figure(object):
         if self.unit != other.unit:
             raise UnitMismatchError('{} - {}'.format(self, other))
         else:
-            return type(self)(value=self.value - other.value, unit=copy.deepcopy(self.unit))
+            return type(self)(value=self.value - other.value, unit=self.unit)

@@ -47,6 +47,23 @@ def test_set_value(value):
     assert value == f.value
 
 
+def test_set_value_persistent():
+    v = [1, 2]
+    f = Figure(value=v)
+    assert Figure([1, 2]) == f
+    v[0] = 3
+    v.append(4)
+    assert Figure([1, 2]) == f
+
+
+def test_set_value_persistent_deep():
+    v = [{'x': 1}, {'x': 2}]
+    f = Figure(value=v)
+    assert Figure([{'x': 1}, {'x': 2}]) == f
+    v[0]['x'] = 3
+    assert Figure([{'x': 1}, {'x': 2}]) == f
+
+
 @pytest.mark.parametrize(('unit'), [
     'μg/l',
     '米/s²',
@@ -60,6 +77,22 @@ def test_set_unit(unit):
     assert None == f.unit
     f.set_unit(unit)
     assert unit == f.unit
+
+
+def test_set_unit_persistent():
+    u = [1, 2]
+    f = Figure(0, u)
+    assert Figure(0, [1, 2]) == f
+    u.append(3)
+    assert Figure(0, [1, 2]) == f
+
+
+def test_set_unit_persistent_deep():
+    u = (['N', 'm'], ['l'])
+    f = Figure(0, u)
+    assert Figure(0, (['N', 'm'], ['l'])) == f
+    u[0].append('g')
+    assert Figure(0, (['N', 'm'], ['l'])) == f
 
 
 @pytest.mark.parametrize(('figure', 'expected_string'), [
