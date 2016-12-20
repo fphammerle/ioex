@@ -74,7 +74,8 @@ class Figure(object):
         return not (self == other)
 
     def __add__(self, other):
-        assert isinstance(self, type(other))
+        if not isinstance(self, type(other)):
+            raise NotImplementedError('{!r} + {!r}'.format(self, other))
         assert not self.value is None
         assert not other.value is None
         if self.unit != other.unit:
@@ -82,8 +83,16 @@ class Figure(object):
         else:
             return type(self)(value=self.value + other.value, unit=self.unit)
 
+    def __radd__(self, other):
+        """ enables use of sum() """
+        if isinstance(other, int) and other == 0:
+            return copy.deepcopy(self)
+        else:
+            raise NotImplementedError('{!r} + {!r}'.format(other, self))
+
     def __sub__(self, other):
-        assert isinstance(self, type(other))
+        if not isinstance(self, type(other)):
+            raise NotImplementedError('{!r} - {!r}'.format(self, other))
         assert not self.value is None
         assert not other.value is None
         if self.unit != other.unit:

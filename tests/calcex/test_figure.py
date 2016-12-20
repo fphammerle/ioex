@@ -155,6 +155,21 @@ def test_add_persistent():
     assert Figure([1, 2], ['m']) == s
 
 
+def test_add_sum():
+    s = sum([Figure(1, 'm'), Figure(2, 'm'), Figure(3, 'm')])
+    assert Figure(6, 'm') == s
+
+
+@pytest.mark.parametrize(('a', 'b'), [
+    [Figure(1, 'm'), 0],
+    [Figure(1, 'm'), 'test'],
+    [1, Figure(1, 'm')],
+])
+def test_add_not_implemented(a, b):
+    with pytest.raises(NotImplementedError):
+        a + b
+
+
 @pytest.mark.parametrize(('a', 'b', 'expected_sum'), [
     [Figure(1, 'm'), Figure(2, 'm'), Figure(-1, 'm')],
     [Figure(-2, 'l'), Figure(-4, 'l'), Figure(2, 'l')],
