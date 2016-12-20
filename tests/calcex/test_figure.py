@@ -214,6 +214,7 @@ def test_mult(a, b, expected_product):
     [Figure(1.0, 'm'), Figure(2), Figure(0.5, 'm')],
     [Figure(1.0, 'm'), 2, Figure(0.5, 'm')],
     [Figure(2.0, 'm'), -1.5, Figure(-4. / 3, 'm')],
+    [Figure(2.0, 'm'), Figure(0.5, 'm'), Figure(4)],
 ])
 def test_div(a, b, expected_quotient):
     generated_quotient = a / b

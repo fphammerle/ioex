@@ -113,7 +113,11 @@ class Figure(object):
         if isinstance(divisor, Figure):
             assert not self.value is None
             assert not divisor.value is None
-            assert divisor.unit is None
-            return type(self)(value=self.value / divisor.value, unit=self.unit)
+            if self.unit == divisor.unit:
+                return Figure(value = self.value / divisor.value, unit = None)
+            elif divisor.unit is None:
+                return type(self)(value=self.value / divisor.value, unit=self.unit)
+            else:
+                raise NotImplementedError('{!r} / {!r}'.format(self, divisor))
         else:
             return self / Figure(value=divisor, unit=None)
