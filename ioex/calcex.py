@@ -90,3 +90,12 @@ class Figure(object):
             raise UnitMismatchError('{} - {}'.format(self, other))
         else:
             return type(self)(value=self.value - other.value, unit=self.unit)
+
+    def __mul__(self, factor):
+        if isinstance(factor, Figure):
+            assert not self.value is None
+            assert not factor.value is None
+            assert factor.unit is None
+            return type(self)(value=self.value * factor.value, unit=self.unit)
+        else:
+            return self * Figure(value=factor, unit=None)

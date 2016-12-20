@@ -182,3 +182,12 @@ def test_sub_persistent():
     b.value = 4
     b.unit[0] = 'l'
     assert Figure(-1, ['m']) == d
+
+
+@pytest.mark.parametrize(('a', 'b', 'expected_product'), [
+    [Figure(1, 'm'), Figure(2), Figure(2, 'm')],
+    [Figure(1, 'm'), 2, Figure(2, 'm')],
+    [Figure(2, 'm'), -1.5, Figure(-3, 'm')],
+])
+def test_mult(a, b, expected_product):
+    assert expected_product == a * b
