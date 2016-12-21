@@ -209,13 +209,14 @@ def test_mult(a, b, expected_product):
     assert expected_product == a * b
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 0), reason='__truediv__ is not defined')
 @pytest.mark.parametrize(('a', 'b', 'expected_quotient'), [
+    [Figure(1, 'm'), Figure(2), Figure(0.5, 'm')],
     [Figure(1.0, 'm'), Figure(2), Figure(0.5, 'm')],
     [Figure(1.0, 'm'), 2, Figure(0.5, 'm')],
     [Figure(2.0, 'm'), -1.5, Figure(-4. / 3, 'm')],
-    [Figure(2.0, 'm'), Figure(0.5, 'm'), Figure(4)],
+    [Figure(2.0, 'm'), Figure(0.5, 'm'), Figure(4.0)],
 ])
 def test_div(a, b, expected_quotient):
     generated_quotient = a / b
     assert expected_quotient == generated_quotient
+    assert isinstance(generated_quotient.value, type(expected_quotient.value))

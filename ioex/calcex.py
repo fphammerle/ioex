@@ -1,6 +1,7 @@
 import copy
 try:
     import yaml
+    import yaml.nodes
 except ImportError:
     yaml = None
 
@@ -50,18 +51,43 @@ class Figure(object):
 
     @classmethod
     def from_yaml(cls, loader, node):
-        return cls(**loader.construct_mapping(node, deep=True))
+        if isinstance(node, yaml.nodes.ScalarNode):
+            seg = loader.construct_scalar(node).split(' ')
+            if seg[0] == '?':
+                value = None
+            else:
+                try:
+                    value = int(seg[0])
+                except ValueError:
+                    value = float(seg[0])
+            return cls(
+                value=value,
+                unit=' '.join(seg[1:]) if len(seg) > 1 else None,
+            )
+        else:
+            return cls(**loader.construct_mapping(node, deep=True))
 
     @classmethod
-    def register_yaml_constructor(cls, loader, tag=yaml_tag):
-        loader.add_constructor(tag, cls.from_yaml)
+    def register_yaml_constructor(cls, loader, tag=None):
+        loader.add_constructor(
+            cls.yaml_tag if tag is None else tag,
+            cls.from_yaml,
+        )
 
     @classmethod
     def to_yaml(cls, dumper, figure, tag=yaml_tag):
-        return dumper.represent_mapping(
-            tag=tag,
-            mapping={'value': figure.value, 'unit': figure.unit},
-        )
+        if figure.value is None or type(figure.value) in [int, float]:
+            value_text = u'?' if figure.value is None else u'{}'.format(figure.value)
+            if figure.unit is None:
+                figure_text = value_text
+            else:
+                figure_text = u'{} {}'.format(value_text, figure.unit)
+            return dumper.represent_scalar(tag=tag, value=figure_text)
+        else:
+            return dumper.represent_mapping(
+                tag=tag,
+                mapping={'value': figure.value, 'unit': figure.unit},
+            )
 
     @classmethod
     def register_yaml_representer(cls, dumper):
@@ -109,15 +135,33 @@ class Figure(object):
         else:
             return self * Figure(value=factor, unit=None)
 
-    def __div__(self, divisor):
+    """
+    $ python2
+    >>> 3/2
+    1
+    $ python3
+    >>> 3/2
+    1.5
+    >>> 4/2
+    2.0
+    """
+
+    def __truediv__(self, divisor):
         if isinstance(divisor, Figure):
             assert not self.value is None
             assert not divisor.value is None
+            if isinstance(self.value, int):
+                value = float(self.value) / divisor.value
+            else:
+                value = self.value / divisor.value
             if self.unit == divisor.unit:
-                return Figure(value = self.value / divisor.value, unit = None)
+                return Figure(value=value, unit=None)
             elif divisor.unit is None:
-                return type(self)(value=self.value / divisor.value, unit=self.unit)
+                return type(self)(value=value, unit=self.unit)
             else:
                 raise NotImplementedError('{!r} / {!r}'.format(self, divisor))
         else:
             return self / Figure(value=divisor, unit=None)
+
+    def __div__(self, divisor):
+        return self.__truediv__(divisor)
