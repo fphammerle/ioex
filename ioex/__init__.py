@@ -96,3 +96,8 @@ def yaml_diff(a, b, dumper = None, colors = False):
     if colors:
         diff_lines = [u'%s%s%s' % (yaml_diff_colors[l[0]], l, ioex.shell.TextColor.default) for l in diff_lines]
     return u''.join(diff_lines)
+
+class AutoDict(dict):
+    def __missing__(self, key):
+        value = self[key] = type(self)()
+        return value
