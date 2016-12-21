@@ -95,11 +95,11 @@ def test_to_yaml_mapping(figure, yaml_dumper):
 def test_register_yaml_representer(figure, yaml_dumper):
     class TestDumper(yaml_dumper):
         pass
-    figure.register_yaml_representer(TestDumper)
+    figure.register_yaml_representer(TestDumper, tag='!test-fig')
     generated_yaml = yaml.dump(figure, Dumper=TestDumper)
 
     class TestLoader(yaml.SafeLoader):
         pass
-    figure.register_yaml_constructor(TestLoader, tag='!figure')
+    figure.register_yaml_constructor(TestLoader, tag='!test-fig')
     loaded_figure = yaml.load(generated_yaml, Loader=TestLoader)
     assert figure == loaded_figure

@@ -77,7 +77,10 @@ class Figure(object):
     @classmethod
     def to_yaml(cls, dumper, figure, tag=yaml_tag):
         if figure.value is None or type(figure.value) in [int, float]:
-            value_text = u'?' if figure.value is None else u'{}'.format(figure.value)
+            if figure.value is None:
+                value_text = u'?'
+            else:
+                value_text = u'{}'.format(figure.value)
             if figure.unit is None:
                 figure_text = value_text
             else:
@@ -90,8 +93,8 @@ class Figure(object):
             )
 
     @classmethod
-    def register_yaml_representer(cls, dumper):
-        dumper.add_representer(cls, cls.to_yaml)
+    def register_yaml_representer(cls, dumper, tag=yaml_tag):
+        dumper.add_representer(cls, lambda d, f: cls.to_yaml(d, f, tag=tag))
 
     def __eq__(self, other):
         return isinstance(self, type(other)) and vars(self) == vars(other)
