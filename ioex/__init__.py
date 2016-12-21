@@ -66,17 +66,22 @@ def yaml_construct_str_as_unicode(loader, node):
     except NameError: # python3
         return string
 
+
 def register_yaml_str_as_unicode_constructor(loader):
-    loader.add_constructor(u'tag:yaml.org,2002:str', yaml_construct_str_as_unicode)
+    loader.add_constructor(
+        u'tag:yaml.org,2002:str',
+        yaml_construct_str_as_unicode,
+        )
+
 
 yaml_diff_colors = {
     ' ': ioex.shell.TextColor.default,
     '+': ioex.shell.TextColor.green,
     '-': ioex.shell.TextColor.red,
     '?': ioex.shell.TextColor.yellow,
-    }
+}
 
-def yaml_diff(a, b, dumper = None, colors = False):
+def yaml_diff(a, b, dumper=None, colors=False):
     if dumper is None:
         class DiffDumper(yaml.Dumper):
             pass
@@ -84,20 +89,31 @@ def yaml_diff(a, b, dumper = None, colors = False):
         dumper = DiffDumper
     def to_yaml(data):
         return yaml.dump(
-                data,
-                Dumper = dumper,
-                default_flow_style = False,
-                allow_unicode = True,
-                )
+            data,
+            Dumper=dumper,
+            default_flow_style=False,
+            allow_unicode=True,
+        )
     diff_lines = difflib.ndiff(
         to_yaml(a).splitlines(True),
         to_yaml(b).splitlines(True),
-        )
+    )
     if colors:
-        diff_lines = [u'%s%s%s' % (yaml_diff_colors[l[0]], l, ioex.shell.TextColor.default) for l in diff_lines]
+        diff_lines = [u'%s%s%s' % (yaml_diff_colors[l[0]], l, ioex.shell.TextColor.default)
+                      for l in diff_lines]
     return u''.join(diff_lines)
 
+
 class AutoDict(dict):
+
     def __missing__(self, key):
         value = self[key] = type(self)()
         return value
+
+    @classmethod
+    def to_yaml(cls, dumper, collection):
+        return dumper.represent_dict(collection)
+
+    @classmethod
+    def register_yaml_representer(cls, dumper):
+        dumper.add_representer(cls, cls.to_yaml)
