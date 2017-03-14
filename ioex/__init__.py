@@ -9,10 +9,12 @@ try:
 except ImportError:
     yaml = None
 
+
 class UnsupportedLocaleSettingError(locale.Error):
     pass
 
 locale_lock = threading.Lock()
+
 
 @contextlib.contextmanager
 def setlocale(temporary_locale):
@@ -29,6 +31,7 @@ def setlocale(temporary_locale):
         finally:
             locale.setlocale(locale.LC_ALL, primary_locale)
 
+
 def raw_input_with_default(prompt, default):
     def pre_input_hook():
         readline.insert_text(default)
@@ -38,6 +41,7 @@ def raw_input_with_default(prompt, default):
         return raw_input(prompt)
     finally:
         readline.set_pre_input_hook(None)
+
 
 def int_input_with_default(prompt, default):
     if default:
@@ -50,20 +54,23 @@ def int_input_with_default(prompt, default):
     else:
         return None
 
+
 def yaml_represent_unicode_as_str(dumper, unicode_string):
     return dumper.represent_scalar(u'tag:yaml.org,2002:str', unicode_string)
+
 
 def register_yaml_unicode_as_str_representer(dumper):
     try:
         dumper.add_representer(unicode, yaml_represent_unicode_as_str)
-    except NameError: # python3
+    except NameError:  # python3
         pass
+
 
 def yaml_construct_str_as_unicode(loader, node):
     string = loader.construct_scalar(node)
     try:
-        return string if type(string) is unicode else string.decode('utf-8')
-    except NameError: # python3
+        return string if isinstance(string, unicode) else string.decode('utf-8')
+    except NameError:  # python3
         return string
 
 
@@ -71,7 +78,7 @@ def register_yaml_str_as_unicode_constructor(loader):
     loader.add_constructor(
         u'tag:yaml.org,2002:str',
         yaml_construct_str_as_unicode,
-        )
+    )
 
 
 yaml_diff_colors = {
@@ -81,12 +88,14 @@ yaml_diff_colors = {
     '?': ioex.shell.TextColor.yellow,
 }
 
+
 def yaml_diff(a, b, dumper=None, colors=False):
     if dumper is None:
         class DiffDumper(yaml.Dumper):
             pass
         register_yaml_unicode_as_str_representer(DiffDumper)
         dumper = DiffDumper
+
     def to_yaml(data):
         return yaml.dump(
             data,
