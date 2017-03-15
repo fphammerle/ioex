@@ -103,3 +103,62 @@ def test_register_yaml_representer(figure, yaml_dumper):
     figure.register_yaml_constructor(TestLoader, tag='!test-fig')
     loaded_figure = yaml.load(generated_yaml, Loader=TestLoader)
     assert figure == loaded_figure
+
+
+@pytest.mark.parametrize(('yaml_loader'), [yaml.Loader, yaml.SafeLoader])
+def test_from_yaml_subclass_explicit_tag(yaml_loader):
+    class SubFigure(Figure):
+        pass
+
+    class TestLoader(yaml_loader):
+        pass
+    Figure.register_yaml_constructor(TestLoader, tag='!fig')
+    SubFigure.register_yaml_constructor(TestLoader, tag='!sfig')
+    subfig = yaml.load("!sfig 12.34 EUR", Loader=TestLoader)
+    assert SubFigure == type(subfig)
+    assert Figure != type(subfig)
+    assert SubFigure(12.34, 'EUR') == subfig
+
+
+@pytest.mark.parametrize(('yaml_loader'), [yaml.Loader, yaml.SafeLoader])
+def test_from_yaml_subclass_implicit_tag(yaml_loader):
+    class SubFigure(Figure):
+        yaml_tag = "!sfig"
+
+    class TestLoader(yaml_loader):
+        pass
+    SubFigure.register_yaml_constructor(TestLoader)
+    subfig = yaml.load("!sfig 12.34 EUR", Loader=TestLoader)
+    assert SubFigure == type(subfig)
+    assert Figure != type(subfig)
+    assert SubFigure(12.34, 'EUR') == subfig
+
+
+@pytest.mark.parametrize(('yaml_dumper'), [yaml.Dumper, yaml.SafeDumper])
+def test_to_yaml_subclass_explicit_tag(yaml_dumper):
+    class SubFigure(Figure):
+        pass
+
+    class TestDumper(yaml_dumper):
+        pass
+    Figure.register_yaml_representer(TestDumper, tag='!fig')
+    SubFigure.register_yaml_representer(TestDumper, tag='!sfig')
+    subfig_yaml = yaml.dump(
+        SubFigure(12.34, 'EUR'),
+        Dumper=TestDumper,
+    )
+    assert "!sfig '12.34 EUR'\n" == subfig_yaml
+
+
+@pytest.mark.parametrize(('yaml_dumper'), [yaml.Dumper, yaml.SafeDumper])
+def test_to_yaml_subclass_implicit_tag(yaml_dumper):
+    class SubFigure(Figure):
+        yaml_tag = "!subfig"
+    class TestDumper(yaml_dumper):
+        pass
+    SubFigure.register_yaml_representer(TestDumper)
+    subfig_yaml = yaml.dump(
+        SubFigure(12.34, 'EUR'),
+        Dumper=TestDumper,
+    )
+    assert "!subfig '12.34 EUR'\n" == subfig_yaml
