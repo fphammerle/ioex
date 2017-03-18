@@ -32,3 +32,21 @@ def test_setlocale_strtime(dt, dt_format, locale_code, expected_string):
             assert dt.strftime(dt_format) == expected_string
     except ioex.UnsupportedLocaleSettingError as ex:
         pytest.skip('locale %s unsupported' % locale_code)
+
+
+@pytest.mark.parametrize(('source', 'locale_code', 'expected_target'), [
+    ['12,34', 'de_DE.utf8', 12.34],
+    ['12.34', 'en_US.utf8', 12.34],
+    ['12,34', 'it_IT.utf8', 12.34],
+    ['12.34', 'zh_CN.utf8', 12.34],
+    ['1.234,56', 'de_DE.utf8', 1234.56],
+    ['1,234.56', 'en_US.utf8', 1234.56],
+    ['1.234,56', 'it_IT.utf8', 1234.56],
+    ['1,234.56', 'zh_CN.utf8', 1234.56],
+])
+def test_setlocale_atof(source, locale_code, expected_target):
+    try:
+        with ioex.setlocale(locale_code):
+            assert expected_target == locale.atof(source)
+    except ioex.UnsupportedLocaleSettingError as ex:
+        pytest.skip('locale %s unsupported' % locale_code)
