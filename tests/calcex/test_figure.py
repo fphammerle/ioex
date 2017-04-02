@@ -220,3 +220,14 @@ def test_div(a, b, expected_quotient):
     generated_quotient = a / b
     assert expected_quotient == generated_quotient
     assert isinstance(generated_quotient.value, type(expected_quotient.value))
+
+
+@pytest.mark.xfail(sys.version_info < (3,), reason="can not overload round() before python3")
+@pytest.mark.parametrize(('source_figure', 'params', 'expected_figure'), [
+    [Figure(12.345, 'm'), [], Figure(12, 'm')],
+    [Figure(12.345, 'm'), [1], Figure(12.3, 'm')],
+    [Figure(12.345, 'm'), [2], Figure(12.35, 'm')],
+    [Figure(12.345, 'm'), [-1], Figure(10, 'm')],
+])
+def test_round(source_figure, params, expected_figure):
+    assert expected_figure == round(source_figure, *params)

@@ -170,3 +170,9 @@ class Figure(object):
 
     def __div__(self, divisor):
         return self.__truediv__(divisor)
+
+    def __round__(self, *params, **kwargs):
+        return type(self)(
+            value=round(self.value, *params, **kwargs),
+            unit=self.unit,
+        )
