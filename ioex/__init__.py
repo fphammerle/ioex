@@ -126,3 +126,19 @@ class AutoDict(dict):
     @classmethod
     def register_yaml_representer(cls, dumper):
         dumper.add_representer(cls, cls.to_yaml)
+
+
+def dict_collapse(dict_src, key_repl):
+    def single_not_none(sub_dict):
+        not_none = [v for v in sub_dict.values() if v is not None]
+        if len(not_none) == 0:
+            return None
+        elif len(not_none) == 1:
+            return not_none[0]
+        else:
+            raise ValueError(sub_dict)
+
+    sub_dicts = AutoDict()
+    for key in dict_src:
+        sub_dicts[key_repl(key)][key] = dict_src[key]
+    return {key: single_not_none(sub) for key, sub in sub_dicts.items()}
