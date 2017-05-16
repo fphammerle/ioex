@@ -51,7 +51,12 @@ class Duration(object):
 
     @property
     def isoformat(self):
-        return 'P%dY' % self.years
+        iso_str = re.sub(
+            r'(?<!\d)0.',
+            '',
+            'P{}Y'.format(self.years),
+        )
+        return 'P0Y' if iso_str == 'P' else iso_str
 
     def __eq__(self, other):
         return (type(self) == type(other)
@@ -145,8 +150,8 @@ class Period(object):
 
     def __eq__(self, other):
         return (type(self) == type(other)
-            and self.start == other.start
-            and self.end == other.end)
+                and self.start == other.start
+                and self.end == other.end)
 
     @classmethod
     def from_yaml(cls, loader, node):
@@ -155,23 +160,23 @@ class Period(object):
     @classmethod
     def to_yaml(cls, dumper, period):
         return dumper.represent_mapping(
-            tag = cls.yaml_tag,
-            mapping = {
+            tag=cls.yaml_tag,
+            mapping={
                 'start': period.start,
                 'end': period.end,
-                },
+            },
             # represent datetime objects with !timestamp tag
-            flow_style = False,
-            )
+            flow_style=False,
+        )
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, ', '.join([
             'start = %r' % self.start,
             'end = %r' % self.end,
-            ]))
+        ]))
 
     @classmethod
-    def register_yaml_constructor(cls, loader, tag = yaml_tag):
+    def register_yaml_constructor(cls, loader, tag=yaml_tag):
         register_yaml_timestamp_constructor(loader)
         loader.add_constructor(tag, cls.from_yaml)
 

@@ -45,6 +45,7 @@ def test_set_years_fail(years, exception_type):
 @pytest.mark.parametrize(('init_params', 'iso'), [
     [{'years': 0}, 'P0Y'],
     [{'years': 3}, 'P3Y'],
+    [{'years': 30}, 'P30Y'],
     ])
 def test_get_isoformat(init_params, iso):
     d = Duration(**init_params)
