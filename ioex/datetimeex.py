@@ -18,9 +18,10 @@ def construct_yaml_timestamp(loader, node):
             timezone_attr = timezone_match.groupdict()
             if timezone_attr['h']:
                 timezone = dateutil.tz.tz.tzoffset(
-                    name = timezone_match.group(0),
-                    offset = (int(timezone_attr['h']) * 60 + int(timezone_attr['m'])) * 60
-                        * (-1 if timezone_attr['sign'] == '-' else 1),
+                    name=timezone_match.group(0),
+                    offset=(
+                        int(timezone_attr['h']) * 60 + int(timezone_attr['m'])) * 60
+                         * (-1 if timezone_attr['sign'] == '-' else 1),
                 )
                 loaded_dt = loaded_dt.astimezone(timezone)
     return loaded_dt
@@ -35,22 +36,25 @@ class Duration(object):
     yaml_tag = u'!duration'
 
     years = ioex.classex.AttributeDescriptor('_years', types=(int,), min=0)
+    days = ioex.classex.AttributeDescriptor('_days', types=(int,), min=0)
 
-    def __init__(self, years=0):
+    def __init__(self, years=0, days=0):
         self.years = years
+        self.days = days
 
     @property
     def isoformat(self):
         iso_str = re.sub(
             r'(?<!\d)0.',
             '',
-            'P{}Y'.format(self.years),
+            'P{}Y{}D'.format(self.years, self.days),
         )
         return 'P0Y' if iso_str == 'P' else iso_str
 
     def __eq__(self, other):
         return (type(self) == type(other)
-                and self.years == other.years)
+                and self.years == other.years
+                and self.days == other.days)
 
     @classmethod
     def from_yaml(cls, loader, node):
@@ -66,7 +70,8 @@ class Duration(object):
             tag=tag,
             mapping={k: v for k, v in {
                 'years': duration.years,
-                }.items() if v != 0},
+                'days': duration.days,
+            }.items() if v != 0},
         )
 
     @classmethod
@@ -131,9 +136,9 @@ class Period(object):
         match = re.search('^%s$' % self.__class__._timeperiod_iso_format, text)
         if not match:
             raise ValueError(
-                    "given string '%s' does not match the supported pattern '%s'"
+                "given string '%s' does not match the supported pattern '%s'"
                      % (text, self.__class__._timeperiod_iso_format)
-                     )
+            )
         attr = match.groupdict()
         self.start = dateutil.parser.parse(attr['start'])
         self.end = dateutil.parser.parse(attr['end'])

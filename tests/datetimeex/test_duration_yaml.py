@@ -11,6 +11,8 @@ yaml = pytest.importorskip('yaml')
     [Duration(years=32), '!duration\nyears: 32'],
     [Duration(years=0),  '!duration\n{}'],
     [Duration(years=0),  '!duration {}'],
+    [Duration(days=32), '!duration\ndays: 32'],
+    [Duration(years=1, days=3), '!duration\nyears: 1\ndays: 3'],
 ])
 def test_from_yaml(expected_duration, yaml_string, loader):
     class TestLoader(loader):
@@ -37,6 +39,8 @@ def test_from_yaml_tag(expected_duration, yaml_string, tag, loader):
 @pytest.mark.parametrize(('duration', 'yaml_string'), [
     [Duration(years=0),  '!duration {}\n'],
     [Duration(years=32), '!duration\nyears: 32\n'],
+    [Duration(days=32), '!duration\ndays: 32\n'],
+    [Duration(years=1, days=2), '!duration\ndays: 2\nyears: 1\n'],
 ])
 def test_to_yaml(duration, yaml_string, dumper):
     class TestDumper(dumper):
