@@ -130,17 +130,23 @@ class Period(object):
             self.end.isoformat().replace('+00:00', 'Z'),
         )
 
-    @isoformat.setter
-    def isoformat(self, text):
-        match = re.search('^%s$' % self.__class__._timeperiod_iso_format, text)
+    @classmethod
+    def from_iso(cls, iso):
+        match = re.search(
+            '^{}$'.format(cls._timeperiod_iso_format),
+            iso,
+        )
         if not match:
             raise ValueError(
                 "given string '%s' does not match the supported pattern '%s'"
-                     % (text, self.__class__._timeperiod_iso_format)
+                     % (iso, cls._timeperiod_iso_format)
             )
-        attr = match.groupdict()
-        self.start = dateutil.parser.parse(attr['start'])
-        self.end = dateutil.parser.parse(attr['end'])
+        else:
+            attr = match.groupdict()
+            return cls(
+                start = dateutil.parser.parse(attr['start']),
+                end = dateutil.parser.parse(attr['end']),
+            )
 
     def __eq__(self, other):
         return (type(self) == type(other)

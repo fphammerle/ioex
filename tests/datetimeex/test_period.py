@@ -110,7 +110,7 @@ def test_get_isoformat(start, end, iso):
     assert p.isoformat == iso
 
 
-@pytest.mark.parametrize(('start', 'end', 'iso'), [
+@pytest.mark.parametrize(('start', 'end', 'source_iso'), [
     [
         datetime.datetime(2016, 7, 24, 12, 21, 0),
         datetime.datetime(2016, 7, 24, 12, 22, 13),
@@ -156,20 +156,18 @@ def test_get_isoformat(start, end, iso):
         '2016-07-24T12:20:00.0255/2016-07-24T12:21:00.13Z',
     ],
 ])
-def test_set_isoformat(start, end, iso):
-    p = ioex.datetimeex.Period()
-    p.isoformat = iso
+def test_from_iso(start, end, source_iso):
+    p = ioex.datetimeex.Period.from_iso(source_iso)
     assert p.start == start
     assert p.end == end
 
 
-@pytest.mark.parametrize(('iso'), [
+@pytest.mark.parametrize(('source_iso'), [
     '2016-07-24T12:20:0<INVALID>0.0255/2016-07-24T12:21:00.13Z',
 ])
-def test_set_isoformat_fail(iso):
-    p = ioex.datetimeex.Period()
+def test_from_iso_fail(source_iso):
     with pytest.raises(ValueError):
-        p.isoformat = iso
+        ioex.datetimeex.Period.from_iso(source_iso)
 
 
 @pytest.mark.parametrize(('a', 'b'), [
