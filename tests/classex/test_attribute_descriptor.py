@@ -112,3 +112,33 @@ def test_min():
     assert 1 == obj.desc
     with pytest.raises(ValueError):
         obj.desc = -1
+
+
+class AlwaysAcceptNone(object):
+
+    a = AttributeDescriptor('_a', types=(str,), always_accept_none=True)
+    b = AttributeDescriptor('_b', types=(str,), always_accept_none=False)
+    c = AttributeDescriptor('_c', types=(str,))
+
+
+def test_always_accept_none_true():
+    obj = AlwaysAcceptNone()
+    obj.a = None
+    assert None == obj.a
+    assert None == obj._a
+
+
+def test_always_accept_none_false():
+    obj = AlwaysAcceptNone()
+    obj.b = 'B'
+    with pytest.raises(TypeError):
+        obj.b = None
+    assert 'B' == obj._b
+
+
+def test_always_accept_none_default():
+    obj = AlwaysAcceptNone()
+    obj.c = 'C'
+    with pytest.raises(TypeError):
+        obj.c = None
+    assert 'C' == obj._c
