@@ -117,17 +117,9 @@ class Period(object):
         always_accept_none=True,
     )
 
-    def __init__(self, start=None, end=None, isoformat=None):
-        if (start or end) and isoformat:
-            raise AttributeError(
-                'when providing isoformat no other'
-                    + ' parameters may be specified',
-            )
-        elif isoformat:
-            self.isoformat = isoformat
-        else:
-            self.start = start
-            self.end = end
+    def __init__(self, start=None, end=None):
+        self.start = start
+        self.end = end
 
     @property
     def isoformat(self):

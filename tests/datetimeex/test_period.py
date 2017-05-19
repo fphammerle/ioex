@@ -28,43 +28,6 @@ def test_init_start_end_fail(start, end):
         ioex.datetimeex.Period(start=start, end=end)
 
 
-@pytest.mark.parametrize(('start', 'end', 'iso'), [
-    [
-        datetime.datetime(2016, 7, 24, 12, 20, 0, microsecond=25500),
-        datetime.datetime(
-            2016, 7, 24, 12, 21, 0,
-            microsecond=130000,
-            tzinfo=pytz.utc,
-        ),
-        '2016-07-24T12:20:00.0255/2016-07-24T12:21:00.13Z',
-    ],
-])
-def test_init_isoformat(start, end, iso):
-    p = ioex.datetimeex.Period(isoformat=iso)
-    assert p.start == start
-    assert p.end == end
-
-
-@pytest.mark.parametrize(('params'), [
-    {
-        'start': datetime.datetime(2016, 7, 24, 12, 20, 0),
-        'end': datetime.datetime(2016, 7, 24, 12, 21, 0),
-        'isoformat': '2016-07-24T12:20:00Z/2016-07-24T12:21:00Z',
-    },
-    {
-        'start': datetime.datetime(2016, 7, 24, 12, 20, 0),
-        'isoformat': '2016-07-24T12:20:00Z/2016-07-24T12:21:00Z',
-    },
-    {
-        'end': datetime.datetime(2016, 7, 24, 12, 21, 0),
-        'isoformat': '2016-07-24T12:20:00Z/2016-07-24T12:21:00Z',
-    },
-])
-def test_init_param_fail(params):
-    with pytest.raises(AttributeError):
-        ioex.datetimeex.Period(**params)
-
-
 @pytest.mark.parametrize(('start'), [
     datetime.datetime(2016, 7, 24, 12, 21),
     None,
