@@ -101,7 +101,7 @@ def test_types():
 
 class MinFilter(object):
 
-    desc = AttributeDescriptor('attr', types=(int,), min=2)
+    desc = AttributeDescriptor('attr', types=(int,), min=0)
 
 
 def test_min():
@@ -111,4 +111,4 @@ def test_min():
     obj.attr = 1
     assert 1 == obj.desc
     with pytest.raises(ValueError):
-        obj.desc = 0
+        obj.desc = -1

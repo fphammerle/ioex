@@ -18,7 +18,7 @@ class AttributeDescriptor(object):
                 type(value).__name__,
                 value,
             ))
-        elif self._min and not self._min <= value:
+        elif self._min is not None and not self._min <= value:
             raise ValueError('expected value >= {!r}, {!r} given'.format(
                 self._min,
                 value,
