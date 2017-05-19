@@ -1,6 +1,7 @@
 import datetime
 import dateutil.parser
 import dateutil.tz.tz
+import ioex.classex
 import re
 
 
@@ -33,21 +34,10 @@ class Duration(object):
 
     yaml_tag = u'!duration'
 
+    years = ioex.classex.AttributeDescriptor('_years', types=(int,), min=0)
+
     def __init__(self, years=0):
         self.years = years
-
-    @property
-    def years(self):
-        return self._years
-
-    @years.setter
-    def years(self, years):
-        if not type(years) is int:
-            raise TypeError('expected int, %r given' % years)
-        elif years < 0:
-            raise ValueError('number of years must be >= 0, %r given' % years)
-        else:
-            self._years = years
 
     @property
     def isoformat(self):
