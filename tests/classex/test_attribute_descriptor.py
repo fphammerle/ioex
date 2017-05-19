@@ -97,3 +97,18 @@ def test_types():
     with pytest.raises(TypeError):
         obj.desc = '123'
     assert isinstance(obj.desc, float) and 1.23 == obj.desc
+
+
+class MinFilter(object):
+
+    desc = AttributeDescriptor('attr', types=(int,), min=2)
+
+
+def test_min():
+    obj = MinFilter()
+    obj.desc = 2
+    assert 2 == obj.attr
+    obj.attr = 1
+    assert 1 == obj.desc
+    with pytest.raises(ValueError):
+        obj.desc = 0
