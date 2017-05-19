@@ -64,9 +64,11 @@ class IntAttr(AttributeDescriptor):
         else:
             super(IntAttr, self).__set__(instance, value)
 
+
 class Qux(object):
 
     desc = IntAttr('attr')
+
 
 def test_subclass():
     obj = Qux()
@@ -78,3 +80,20 @@ def test_subclass():
     assert 42 == obj.desc
     with pytest.raises(TypeError):
         obj.desc = 3.14
+
+
+class Xyzzy(object):
+
+    desc = AttributeDescriptor('attr', types=(int, float))
+
+
+def test_types():
+    obj = Xyzzy()
+    obj.desc = 1
+    assert 1 == obj.attr
+    assert isinstance(obj.desc, int) and 1 == obj.desc
+    obj.desc = 1.23
+    assert isinstance(obj.desc, float) and 1.23 == obj.desc
+    with pytest.raises(TypeError):
+        obj.desc = '123'
+    assert isinstance(obj.desc, float) and 1.23 == obj.desc
