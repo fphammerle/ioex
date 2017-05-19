@@ -18,9 +18,10 @@ class AttributeDescriptor(object):
                 type(value).__name__,
                 value,
             ))
-        if self._min and not self._min <= value:
+        elif self._min and not self._min <= value:
             raise ValueError('expected value >= {!r}, {!r} given'.format(
                 self._min,
                 value,
             ))
-        setattr(instance, self._name, value)
+        else:
+            setattr(instance, self._name, value)
