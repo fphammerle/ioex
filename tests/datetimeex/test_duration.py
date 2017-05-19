@@ -2,6 +2,8 @@
 import pytest
 
 from ioex.datetimeex import Duration
+import datetime
+import pytz
 
 
 @pytest.mark.parametrize(('init_kwargs'), [
@@ -123,3 +125,33 @@ def test_from_iso_fail(source_iso):
 def test_eq(a, b):
     assert a == b
     assert b == a
+
+
+@pytest.mark.parametrize(('src_dt', 'duration', 'expected_sum'), [
+    [
+        datetime.datetime(2017, 5, 19, 21, 7, 1),
+        Duration(years=3),
+        datetime.datetime(2020, 5, 19, 21, 7, 1),
+    ],
+    [
+        datetime.datetime(2016, 2, 29, 21, 7, 1),
+        Duration(years=1),
+        datetime.datetime(2017, 2, 28, 21, 7, 1),
+    ],
+    [
+        datetime.datetime(2016, 2, 29, 21, 7, 1),
+        Duration(years=1, days=6),
+        datetime.datetime(2017, 3, 6, 21, 7, 1),
+    ],
+    [
+        pytz.timezone('Europe/Vienna').localize(
+            datetime.datetime(2016, 2, 29, 21, 7, 1),
+        ),
+        Duration(years=1, days=6),
+        pytz.timezone('Europe/Vienna').localize(
+            datetime.datetime(2017, 3, 6, 21, 7, 1),
+        ),
+    ],
+])
+def test_radd_datetime(src_dt, duration, expected_sum):
+    assert expected_sum == src_dt + duration

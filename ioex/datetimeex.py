@@ -1,5 +1,6 @@
 import datetime
 import dateutil.parser
+import dateutil.relativedelta
 import dateutil.tz.tz
 import ioex.classex
 import re
@@ -73,6 +74,15 @@ class Duration(object):
         return (type(self) == type(other)
                 and self.years == other.years
                 and self.days == other.days)
+
+    def __radd__(self, dt):
+        if not isinstance(dt, datetime.datetime):
+            raise TypeError('expected datetime, {!r} given'.format(dt))
+        else:
+            return dt + dateutil.relativedelta.relativedelta(
+                years=self.years,
+                days=self.days,
+            )
 
     @classmethod
     def from_yaml(cls, loader, node):
