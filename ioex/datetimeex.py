@@ -106,9 +106,18 @@ class Period(object):
         t=_timestamp_iso_format,
     )
 
+    start = ioex.classex.AttributeDescriptor(
+        '_start',
+        types=(datetime.datetime,),
+        always_accept_none=True,
+    )
+    end = ioex.classex.AttributeDescriptor(
+        '_end',
+        types=(datetime.datetime,),
+        always_accept_none=True,
+    )
+
     def __init__(self, start=None, end=None, isoformat=None):
-        self._start = None
-        self._end = None
         if (start or end) and isoformat:
             raise AttributeError(
                 'when providing isoformat no other'
@@ -119,26 +128,6 @@ class Period(object):
         else:
             self.start = start
             self.end = end
-
-    @property
-    def start(self):
-        return self._start
-
-    @start.setter
-    def start(self, start):
-        if not (start is None or type(start) is datetime.datetime):
-            raise TypeError()
-        self._start = start
-
-    @property
-    def end(self):
-        return self._end
-
-    @end.setter
-    def end(self, end):
-        if not (end is None or type(end) is datetime.datetime):
-            raise TypeError()
-        self._end = end
 
     @property
     def isoformat(self):
