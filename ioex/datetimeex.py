@@ -35,6 +35,8 @@ class Duration(object):
 
     yaml_tag = u'!duration'
 
+    iso_format = r'P((?P<y>\d+)Y)?((?P<d>\d+)D)?'
+
     years = ioex.classex.AttributeDescriptor('_years', types=(int,), min=0)
     days = ioex.classex.AttributeDescriptor('_days', types=(int,), min=0)
 
@@ -50,6 +52,22 @@ class Duration(object):
             'P{}Y{}D'.format(self.years, self.days),
         )
         return 'P0Y' if iso_str == 'P' else iso_str
+
+    @classmethod
+    def from_iso(cls, iso):
+        match = re.search(
+            r'^{}$'.format(cls.iso_format),
+            iso,
+        )
+        if not match:
+            raise ValueError('unsupported string {!r}'.format(iso))
+        else:
+            attr = {k: int(v) if v is not None else 0
+                    for k, v in match.groupdict().items()}
+            return cls(
+                years=attr['y'],
+                days=attr['d'],
+            )
 
     def __eq__(self, other):
         return (type(self) == type(other)

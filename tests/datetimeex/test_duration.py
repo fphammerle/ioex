@@ -90,6 +90,28 @@ def test_get_isoformat(init_params, iso):
     assert d.isoformat == iso
 
 
+@pytest.mark.parametrize(('expected', 'source_iso'), [
+    [Duration(years=0), 'P0Y'],
+    [Duration(years=30), 'P30Y'],
+    [Duration(years=3), 'P3Y'],
+    [Duration(days=30), 'P30D'],
+    [Duration(days=3), 'P3D'],
+    [Duration(years=10, days=30), 'P10Y30D'],
+])
+def test_from_iso(expected, source_iso):
+    d = Duration.from_iso(source_iso)
+    assert expected == d
+
+
+@pytest.mark.parametrize(('source_iso'), [
+    'Q0Y',
+    '2017-05-19T20:02:22+02:00',
+])
+def test_from_iso_fail(source_iso):
+    with pytest.raises(ValueError):
+        Duration.from_iso(source_iso)
+
+
 @pytest.mark.parametrize(('a', 'b'), [
     [Duration(), Duration(years=0, days=0)],
     [Duration(years=0), Duration(years=0)],
