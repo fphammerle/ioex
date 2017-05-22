@@ -188,6 +188,15 @@ def test_sub_unit_mismatch(a, b):
         a - b
 
 
+@pytest.mark.parametrize(('a', 'b'), [
+    [Figure(1, 'm'), 2],
+    [Figure(1, 'm'), None],
+])
+def test_sub_not_implemented(a, b):
+    with pytest.raises(NotImplementedError):
+        a - b
+
+
 def test_sub_persistent():
     a = Figure(1, ['m'])
     b = Figure(2, ['m'])
@@ -198,6 +207,10 @@ def test_sub_persistent():
     b.value = 4
     b.unit[0] = 'l'
     assert Figure(-1, ['m']) == d
+
+
+def test_sub_null_subtrahend():
+    assert Figure(1, ['m']) == Figure(1, ['m']) - sum([])
 
 
 @pytest.mark.parametrize(('a', 'b', 'expected_product'), [

@@ -6,6 +6,9 @@ except ImportError:
     yaml = None
 
 
+EMPTY_SUM = sum([])
+
+
 class UnitMismatchError(ValueError):
     pass
 
@@ -122,11 +125,11 @@ class Figure(object):
             raise NotImplementedError('{!r} + {!r}'.format(other, self))
 
     def __sub__(self, other):
-        if not isinstance(self, type(other)):
+        if isinstance(other, type(EMPTY_SUM)) and other == EMPTY_SUM:
+            return copy.deepcopy(self)
+        elif not isinstance(self, type(other)):
             raise NotImplementedError('{!r} - {!r}'.format(self, other))
-        assert not self.value is None
-        assert not other.value is None
-        if self.unit != other.unit:
+        elif self.unit != other.unit:
             raise UnitMismatchError('{} - {}'.format(self, other))
         else:
             return type(self)(value=self.value - other.value, unit=self.unit)
