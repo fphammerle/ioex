@@ -244,3 +244,13 @@ def test_div(a, b, expected_quotient):
 ])
 def test_round(source_figure, params, expected_figure):
     assert expected_figure == round(source_figure, *params)
+
+
+@pytest.mark.parametrize(('source_figure', 'expected_figure'), [
+    [Figure(1, 'm'), Figure(1, 'm')],
+    [Figure(-1, 'm'), Figure(1, 'm')],
+    [Figure(0, 'm'), Figure(0, 'm')],
+    [Figure(-1.23, 'm'), Figure(1.23, 'm')],
+])
+def test_abs(source_figure, expected_figure):
+    assert expected_figure == abs(source_figure)

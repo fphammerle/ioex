@@ -179,3 +179,9 @@ class Figure(object):
             value=round(self.value, *params, **kwargs),
             unit=self.unit,
         )
+
+    def __abs__(self):
+        return type(self)(
+            value=abs(self.value),
+            unit=self.unit,
+        )
