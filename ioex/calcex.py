@@ -108,7 +108,10 @@ class Figure(object):
         return not (self == other)
 
     def __add__(self, other):
-        if not isinstance(self, type(other)):
+        """ allows self + sum([]) """
+        if isinstance(other, type(EMPTY_SUM)) and other == EMPTY_SUM:
+            return copy.deepcopy(self)
+        elif not isinstance(self, type(other)):
             raise NotImplementedError('{!r} + {!r}'.format(self, other))
         assert not self.value is None
         assert not other.value is None

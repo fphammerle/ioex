@@ -161,13 +161,17 @@ def test_add_sum():
 
 
 @pytest.mark.parametrize(('a', 'b'), [
-    [Figure(1, 'm'), 0],
+    [Figure(1, 'm'), 0.0],
     [Figure(1, 'm'), 'test'],
     [1, Figure(1, 'm')],
 ])
 def test_add_not_implemented(a, b):
     with pytest.raises(NotImplementedError):
         a + b
+
+
+def test_add_null_summand():
+    assert Figure(1, ['m']) == Figure(1, ['m']) + sum([])
 
 
 @pytest.mark.parametrize(('a', 'b', 'expected_diff'), [
