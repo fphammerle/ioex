@@ -170,13 +170,13 @@ def test_add_not_implemented(a, b):
         a + b
 
 
-@pytest.mark.parametrize(('a', 'b', 'expected_sum'), [
+@pytest.mark.parametrize(('a', 'b', 'expected_diff'), [
     [Figure(1, 'm'), Figure(2, 'm'), Figure(-1, 'm')],
     [Figure(-2, 'l'), Figure(-4, 'l'), Figure(2, 'l')],
     [Figure(-1), Figure(3), Figure(-4, None)],
 ])
-def test_sub(a, b, expected_sum):
-    assert expected_sum == a - b
+def test_sub(a, b, expected_diff):
+    assert expected_diff == a - b
 
 
 @pytest.mark.parametrize(('a', 'b'), [
