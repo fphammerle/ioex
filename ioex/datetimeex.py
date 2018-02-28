@@ -36,22 +36,25 @@ class Duration(object):
 
     yaml_tag = u'!duration'
 
-    iso_format = r'P((?P<y>\d+)Y)?((?P<d>\d+)D)?'
+    iso_format = r'P((?P<y>\d+)Y)?((?P<d>\d+)D)?' \
+        + r'(T(?P<min>\d+)M)?'
 
     years = ioex.classex.AttributeDescriptor('_years', types=(int,), min=0)
     days = ioex.classex.AttributeDescriptor('_days', types=(int,), min=0)
+    minutes = ioex.classex.AttributeDescriptor('_minutes', types=(int,), min=0)
 
-    def __init__(self, years=0, days=0):
+    def __init__(self, years=0, days=0, minutes=0):
         self.years = years
         self.days = days
+        self.minutes = minutes
 
     @property
     def isoformat(self):
         iso_str = re.sub(
             r'(?<!\d)0.',
             '',
-            'P{}Y{}D'.format(self.years, self.days),
-        )
+            'P{}Y{}DT{}M'.format(self.years, self.days, self.minutes),
+        ).rstrip('T')
         return 'P0Y' if iso_str == 'P' else iso_str
 
     @classmethod
@@ -68,12 +71,14 @@ class Duration(object):
             return cls(
                 years=attr['y'],
                 days=attr['d'],
+                minutes=attr['min'],
             )
 
     def __eq__(self, other):
         return (type(self) == type(other)
                 and self.years == other.years
-                and self.days == other.days)
+                and self.days == other.days
+                and self.minutes == other.minutes)
 
     def __radd__(self, dt):
         if not isinstance(dt, datetime.datetime):
@@ -82,6 +87,7 @@ class Duration(object):
             return dt + dateutil.relativedelta.relativedelta(
                 years=self.years,
                 days=self.days,
+                minutes=self.minutes,
             )
 
     @classmethod
@@ -99,6 +105,7 @@ class Duration(object):
             mapping={k: v for k, v in {
                 'years': duration.years,
                 'days': duration.days,
+                'minutes': duration.minutes,
             }.items() if v != 0},
         )
 
@@ -154,8 +161,8 @@ class Period(object):
         else:
             attr = match.groupdict()
             return cls(
-                start = dateutil.parser.parse(attr['start']),
-                end = dateutil.parser.parse(attr['end']),
+                start=dateutil.parser.parse(attr['start']),
+                end=dateutil.parser.parse(attr['end']),
             )
 
     def __eq__(self, other):

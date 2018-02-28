@@ -11,7 +11,9 @@ import pytz
     {'years': 13},
     {'days': 0},
     {'days': 13},
+    {'minutes': 7},
     {'years': 1, 'days': 3},
+    {'years': 1, 'days': 3, 'minutes': 5},
 ])
 def test_init(init_kwargs):
     d = Duration(**init_kwargs)
@@ -26,6 +28,7 @@ def test_init_default():
     d = Duration()
     assert 0 == d.years
     assert 0 == d.days
+    assert 0 == d.minutes
 
 
 @pytest.mark.parametrize(('init_kwargs', 'exception_type'), [
@@ -33,6 +36,8 @@ def test_init_default():
     [{'years': '1'}, TypeError],
     [{'days': -2}, ValueError],
     [{'days': '1'}, TypeError],
+    [{'minutes': -2}, ValueError],
+    [{'minutes': '1'}, TypeError],
 ])
 def test_init_fail(init_kwargs, exception_type):
     with pytest.raises(exception_type):
@@ -79,13 +84,36 @@ def test_set_days_fail(days, exception_type):
         d.days = days
 
 
+@pytest.mark.parametrize(('minutes'), [
+    0,
+    13,
+])
+def test_set_minutes(minutes):
+    d = Duration()
+    d.minutes = minutes
+    assert d.minutes == minutes
+
+
+@pytest.mark.parametrize(('minutes', 'exception_type'), [
+    [-2, ValueError],
+    ['1', TypeError],
+])
+def test_set_minutes_fail(minutes, exception_type):
+    d = Duration()
+    with pytest.raises(exception_type):
+        d.minutes = minutes
+
+
 @pytest.mark.parametrize(('init_params', 'iso'), [
     [{'years': 0}, 'P0Y'],
     [{'years': 30}, 'P30Y'],
     [{'years': 3}, 'P3Y'],
     [{'days': 30}, 'P30D'],
     [{'days': 3}, 'P3D'],
+    [{'minutes': 3}, 'PT3M'],
     [{'years': 10, 'days': 30}, 'P10Y30D'],
+    [{'days': 30, 'minutes': 50}, 'P30DT50M'],
+    [{'years': 10, 'days': 30, 'minutes': 50}, 'P10Y30DT50M'],
 ])
 def test_get_isoformat(init_params, iso):
     d = Duration(**init_params)
@@ -98,7 +126,10 @@ def test_get_isoformat(init_params, iso):
     [Duration(years=3), 'P3Y'],
     [Duration(days=30), 'P30D'],
     [Duration(days=3), 'P3D'],
+    [Duration(minutes=3), 'PT3M'],
     [Duration(years=10, days=30), 'P10Y30D'],
+    [Duration(days=30, minutes=50), 'P30DT50M'],
+    [Duration(years=10, days=30, minutes=50), 'P10Y30DT50M'],
 ])
 def test_from_iso(expected, source_iso):
     d = Duration.from_iso(source_iso)
@@ -107,6 +138,7 @@ def test_from_iso(expected, source_iso):
 
 @pytest.mark.parametrize(('source_iso'), [
     'Q0Y',
+    'P10M20M',
     '2017-05-19T20:02:22+02:00',
 ])
 def test_from_iso_fail(source_iso):
@@ -120,7 +152,10 @@ def test_from_iso_fail(source_iso):
     [Duration(years=3), Duration(years=3)],
     [Duration(days=0), Duration(days=0)],
     [Duration(days=3), Duration(days=3)],
+    [Duration(minutes=3), Duration(minutes=3)],
     [Duration(years=1, days=3), Duration(years=1, days=3)],
+    [Duration(years=1, days=3, minutes=5),
+     Duration(years=1, days=3, minutes=5)],
 ])
 def test_eq(a, b):
     assert a == b
@@ -142,6 +177,11 @@ def test_eq(a, b):
         datetime.datetime(2016, 2, 29, 21, 7, 1),
         Duration(years=1, days=6),
         datetime.datetime(2017, 3, 6, 21, 7, 1),
+    ],
+    [
+        datetime.datetime(2016, 2, 29, 21, 7, 1),
+        Duration(years=1, days=6, minutes=18),
+        datetime.datetime(2017, 3, 6, 21, 25, 1),
     ],
     [
         pytz.timezone('Europe/Vienna').localize(
